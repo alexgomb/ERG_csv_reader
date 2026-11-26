@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nbio-erg-trace"
+version = "0.1.0"
+description = "nBio ERG-Trace — Mouse electroretinography (ERG) viewer and amplitude analyzer for CSO Retimax CSV exports"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    {name = "Alejandro Gombau García"},
+]
+keywords = ["erg", "electroretinography", "retimax", "cso", "ophthalmology", "vision-science", "mouse"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+]
+dependencies = [
+    "PySide6>=6.6.0",
+    "pyqtgraph>=0.13.3",
+    "numpy>=1.26.0",
+    "scipy>=1.11.0",
+    "openpyxl>=3.1.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-qt>=4.4.0",
+    "ruff>=0.4.0",
+    "pyinstaller>=6.6.0",
+]
+
+[project.scripts]
+nbio-erg-trace = "erg_reader.app:main"
+erg-reader = "erg_reader.app:main"
+
+[project.gui-scripts]
+nbio-erg-trace-gui = "erg_reader.app:main"
+erg-reader-gui = "erg_reader.app:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E501"]
