@@ -10,6 +10,7 @@ a = Analysis(
     pathex=[str(ROOT / "src")],
     binaries=[],
     datas=[
+        (str(ROOT / "src" / "erg_reader" / "assets"), "erg_reader/assets"),
         (str(ROOT / "example_files"), "example_files"),
         (str(ROOT / "LICENSE"), "."),
     ],

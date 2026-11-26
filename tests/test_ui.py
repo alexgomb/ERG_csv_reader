@@ -75,3 +75,25 @@ def test_mainwindow_manual_marker_drag_reset_and_overlay(qtbot, tmp_path: Path) 
     win.reset_active_markers()
     assert da3.markers.is_manual is False
     assert da3.markers.b1_idx == orig_b1
+
+
+def test_umh_nbio_svg_branding_and_about_dialog(qtbot) -> None:
+    from PySide6.QtWidgets import QLabel
+
+    from erg_reader.i18n import Translator
+    from erg_reader.ui.branding import render_umh_nbio_pixmap
+    from erg_reader.ui.dialogs import AboutDialog
+
+    for dark in (False, True):
+        pix = render_umh_nbio_pixmap(width=256, dark_mode=dark)
+        assert not pix.isNull()
+        assert pix.width() > 200
+
+    for lang in ("en", "es"):
+        dlg = AboutDialog(Translator(lang), theme="light")
+        qtbot.addWidget(dlg)
+        texts = " ".join(lbl.text() for lbl in dlg.findChildren(QLabel))
+        assert "Grupo nBio" in texts
+        assert "Instituto de Bioingeniería" in texts
+        assert "Universidad Miguel Hernández" in texts
+

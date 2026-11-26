@@ -126,6 +126,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
             "• Batch CSV / Excel export, PNG / SVG plot export, and JSON work sessions"
         ),
         "about_author_label": "Author:",
+        "about_group_label": "Research Group:",
+        "about_group_value": "Grupo nBio · Instituto de Bioingeniería\nUniversidad Miguel Hernández",
+        "about_web_label": "Website:",
         "about_version_label": "Version:",
         "about_license_label": "License:",
         "about_repo_label": "Repository:",
@@ -283,6 +286,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
             "• Exportación por lotes a CSV / Excel, gráficas PNG / SVG y sesiones de trabajo JSON"
         ),
         "about_author_label": "Autor:",
+        "about_group_label": "Grupo / Institución:",
+        "about_group_value": "Grupo nBio · Instituto de Bioingeniería\nUniversidad Miguel Hernández",
+        "about_web_label": "Web:",
         "about_version_label": "Versión:",
         "about_license_label": "Licencia:",
         "about_repo_label": "Repositorio:",

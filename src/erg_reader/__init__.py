@@ -1,7 +1,7 @@
 """nBio ERG-Trace — Mouse electroretinography viewer and analyzer for CSO Retimax CSV exports."""
 
 APP_NAME = "nBio ERG-Trace"
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __author__ = "Alejandro Gombau García"
 __license__ = "MIT"
 REPO_URL = "https://github.com/alexgomb/ERG_csv_reader"

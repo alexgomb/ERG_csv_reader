@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nbio-erg-trace"
-version = "0.1.0"
+version = "0.1.1"
 description = "nBio ERG-Trace — Mouse electroretinography (ERG) viewer and amplitude analyzer for CSO Retimax CSV exports"
 readme = "README.md"
 license = "MIT"
@@ -49,6 +49,9 @@ erg-reader-gui = "erg_reader.app:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+erg_reader = ["assets/*.svg"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

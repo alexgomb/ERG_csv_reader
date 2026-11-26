@@ -1,9 +1,50 @@
-"""Programmatic vector app icon and sidebar emblem for nBio ERG-Trace."""
+"""Programmatic vector app icon and UMH · nBio SVG logo renderers for nBio ERG-Trace."""
 
 from __future__ import annotations
 
-from PySide6.QtCore import QPointF, Qt
+import sys
+from pathlib import Path
+
+from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import QColor, QIcon, QPainter, QPainterPath, QPen, QPixmap
+from PySide6.QtSvg import QSvgRenderer
+
+
+def _find_asset_path(filename: str) -> Path | None:
+    """Locate bundled SVG asset across editable installs, wheels, and PyInstaller bundles."""
+    candidates: list[Path] = []
+    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+        candidates.append(Path(sys._MEIPASS) / "erg_reader" / "assets" / filename)
+        candidates.append(Path(sys._MEIPASS) / "assets" / filename)
+
+    candidates.append(Path(__file__).resolve().parents[1] / "assets" / filename)
+    for path in candidates:
+        if path.is_file():
+            return path
+    return None
+
+
+def render_umh_nbio_pixmap(width: int = 250, dark_mode: bool = False) -> QPixmap:
+    """Render the crisp vector UMH · nBio SVG logo at 2x HiDPI resolution."""
+    svg_name = "umh_nbio_dark.svg" if dark_mode else "umh_nbio_light.svg"
+    svg_path = _find_asset_path(svg_name)
+
+    aspect = 102.0 / 426.0
+    height = max(24, int(round(width * aspect)))
+    dpr = 2.0
+    pixmap = QPixmap(int(round(width * dpr)), int(round(height * dpr)))
+    pixmap.fill(Qt.GlobalColor.transparent)
+    pixmap.setDevicePixelRatio(dpr)
+
+    if svg_path is not None:
+        renderer = QSvgRenderer(str(svg_path))
+        if renderer.isValid():
+            painter = QPainter(pixmap)
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+            painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
+            renderer.render(painter, QRectF(0.0, 0.0, float(width), float(height)))
+            painter.end()
+    return pixmap
 
 
 def create_erg_pixmap(size: int = 44, dark_mode: bool = False) -> QPixmap:
@@ -17,7 +58,7 @@ def create_erg_pixmap(size: int = 44, dark_mode: bool = False) -> QPixmap:
     bg_color = QColor("#0C4A6E") if dark_mode else QColor("#1D4ED8")
     border_color = QColor("#38BDF8") if dark_mode else QColor("#1E3A8A")
     wave_color = QColor("#F8FAFC")
-    accent_color = QColor("#FACC15")
+    accent_color = QColor("#AEE033")
 
     margin = size * 0.06
     rect_size = size - 2 * margin
@@ -46,7 +87,7 @@ def create_erg_pixmap(size: int = 44, dark_mode: bool = False) -> QPixmap:
     painter.setPen(wave_pen)
     painter.drawPath(wave)
 
-    # Highlight dot on B1 peak
+    # Highlight dot on B1 peak (nBio lime accent)
     painter.setPen(Qt.PenStyle.NoPen)
     painter.setBrush(accent_color)
     dot_r = max(2.2, size * 0.068)

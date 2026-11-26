@@ -132,6 +132,13 @@ QT_QPA_PLATFORM=offscreen pytest -v
 
 ## Changelog
 
+### [0.1.1] — 2026-11-26
+
+#### Added
+- Pure vector SVG **UMH · nBio** institutional logo (`umh_nbio_light.svg` / `umh_nbio_dark.svg`) rendered at 2× HiDPI in the left sidebar and About dialog, adapting cleanly to Light and Dark modes.
+- Added institutional affiliation in the About dialog: **Grupo nBio · Instituto de Bioingeniería · Universidad Miguel Hernández** (`http://nbio.umh.es`).
+- Bundled SVG assets in both `pyproject.toml` package data and the PyInstaller `nBio_ERG_Trace.exe` Windows release build.
+
 ### [0.1.0] — 2026-11-26
 
 #### Added
@@ -150,6 +157,6 @@ QT_QPA_PLATFORM=offscreen pytest -v
 
 ## Contributors & License
 
-- **Author:** Alejandro Gombau García
+- **Author:** Alejandro Gombau García · Grupo nBio, Instituto de Bioingeniería, Universidad Miguel Hernández
 - **Contributors:** [Gemini](https://github.com/gemini-code-assist) (`@gemini-code-assist`) & [Antigravity](https://github.com/apps/antigravity-for-github)
 - **License:** [MIT License](LICENSE)

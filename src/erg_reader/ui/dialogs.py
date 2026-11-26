@@ -25,7 +25,7 @@ from erg_reader.models import (
     ERGProtocol,
     default_detection_windows,
 )
-from erg_reader.ui.branding import create_erg_pixmap
+from erg_reader.ui.branding import create_erg_pixmap, render_umh_nbio_pixmap
 
 PROTOCOL_ORDER = (
     ERGProtocol.DARK_ADAPTED_3,
@@ -160,14 +160,15 @@ class SettingsDialog(QDialog):
 
 
 class AboutDialog(QDialog):
-    """About dialog showing author attribution, MIT license, version, and feature overview."""
+    """About dialog showing UMH · nBio vector logo, institutional affiliation, author, and MIT license."""
 
     def __init__(self, translator: Translator, theme: str = "light", parent=None) -> None:
         super().__init__(parent)
         self._tr = translator
         self.setWindowTitle(self._tr.tr("about_title"))
-        self.setMinimumWidth(460)
+        self.setMinimumWidth(490)
 
+        is_dark = theme == "dark"
         layout = QVBoxLayout(self)
         layout.setContentsMargins(18, 18, 18, 16)
         layout.setSpacing(12)
@@ -175,7 +176,7 @@ class AboutDialog(QDialog):
         header = QHBoxLayout()
         header.setSpacing(14)
         logo = QLabel()
-        logo.setPixmap(create_erg_pixmap(56, dark_mode=(theme == "dark")))
+        logo.setPixmap(create_erg_pixmap(54, dark_mode=is_dark))
         header.addWidget(logo)
 
         title_col = QVBoxLayout()
@@ -188,16 +189,36 @@ class AboutDialog(QDialog):
         header.addLayout(title_col, stretch=1)
         layout.addLayout(header)
 
+        # Crisp vector UMH · nBio institutional banner
+        banner_lbl = QLabel()
+        banner_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        banner_lbl.setPixmap(render_umh_nbio_pixmap(width=400, dark_mode=is_dark))
+        layout.addWidget(banner_lbl)
+
         desc = QLabel(self._tr.tr("about_description"))
         desc.setWordWrap(True)
         layout.addWidget(desc)
 
         info_form = QFormLayout()
-        info_form.setVerticalSpacing(4)
+        info_form.setVerticalSpacing(5)
         info_form.addRow(self._tr.tr("about_author_label"), QLabel(f"<b>{__author__}</b>"))
+
+        group_lbl = QLabel(self._tr.tr("about_group_value"))
+        group_lbl.setWordWrap(True)
+        info_form.addRow(self._tr.tr("about_group_label"), group_lbl)
+
+        link_color = "#38BDF8" if is_dark else "#1D4ED8"
+        web_lbl = QLabel(
+            f"<a href='http://nbio.umh.es' style='color:{link_color};'>http://nbio.umh.es</a>"
+        )
+        web_lbl.setOpenExternalLinks(True)
+        info_form.addRow(self._tr.tr("about_web_label"), web_lbl)
+
         info_form.addRow(self._tr.tr("about_version_label"), QLabel(f"v{__version__}"))
         info_form.addRow(self._tr.tr("about_license_label"), QLabel(__license__))
-        repo_lbl = QLabel(f"<a href='{REPO_URL}'>{REPO_URL}</a>")
+        repo_lbl = QLabel(
+            f"<a href='{REPO_URL}' style='color:{link_color};'>{REPO_URL}</a>"
+        )
         repo_lbl.setOpenExternalLinks(True)
         info_form.addRow(self._tr.tr("about_repo_label"), repo_lbl)
         layout.addLayout(info_form)

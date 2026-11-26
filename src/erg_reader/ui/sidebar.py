@@ -21,7 +21,7 @@ from PySide6.QtWidgets import (
 from erg_reader import APP_NAME
 from erg_reader.i18n import Translator
 from erg_reader.models import ERGSessionRecord, EyeSide
-from erg_reader.ui.branding import create_erg_pixmap
+from erg_reader.ui.branding import create_erg_pixmap, render_umh_nbio_pixmap
 
 
 class SidebarPanel(QFrame):
@@ -144,6 +144,12 @@ class SidebarPanel(QFrame):
 
         layout.addWidget(self.traces_group, stretch=1)
 
+        # Institutional UMH · nBio vector SVG logo (Retimax bottom-left placement)
+        self.umh_nbio_logo = QLabel()
+        self.umh_nbio_logo.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.umh_nbio_logo.setToolTip("Grupo nBio · Instituto de Bioingeniería · Universidad Miguel Hernández")
+        layout.addWidget(self.umh_nbio_logo)
+
         # Subtle author credit footer
         self.author_footer = QLabel()
         self.author_footer.setObjectName("AuthorFooter")
@@ -155,7 +161,9 @@ class SidebarPanel(QFrame):
 
     def apply_theme(self, theme: str) -> None:
         self._theme = theme
-        self.logo_label.setPixmap(create_erg_pixmap(40, dark_mode=(theme == "dark")))
+        is_dark = theme == "dark"
+        self.logo_label.setPixmap(create_erg_pixmap(40, dark_mode=is_dark))
+        self.umh_nbio_logo.setPixmap(render_umh_nbio_pixmap(width=256, dark_mode=is_dark))
 
     def retranslate_ui(self) -> None:
         self.brand_subtitle.setText(self._tr.tr("subtitle_badge"))

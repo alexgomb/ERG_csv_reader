@@ -5,6 +5,7 @@
 **nBio ERG-Trace** is a native desktop Python application (**PySide6 + PyQtGraph**) for reading, visualizing, and analyzing mouse electroretinography (ERG) recordings exported as CSV files from the **CSO Retimax** system.
 
 - **Author:** Alejandro Gombau García
+- **Research Group:** Grupo nBio · Instituto de Bioingeniería · Universidad Miguel Hernández (`http://nbio.umh.es`)
 - **License:** MIT (`LICENSE`)
 - **Repository:** `alexgomb/ERG_csv_reader` (private GitHub repository)
 - **Primary Scientific Focus:** Exclusively **left-eye (`LEFT - OS`)** murine ERG recordings, maintaining strict **1:1 raw signal fidelity** with CSO Retimax CSV exports.
@@ -56,6 +57,7 @@
 | `src/erg_reader/exporters.py` | Batch CSV & formatted Excel `.xlsx` exporters, clipboard TSV formatter, JSON session save/load |
 | `src/erg_reader/i18n.py` | Complete English & Spanish translation catalog and `Translator` class |
 | `src/erg_reader/themes.py` | Light & Dark QSS stylesheets and PyQtGraph color palettes |
+| `src/erg_reader/assets/` | Pure vector UMH · nBio institutional SVGs (`umh_nbio_light.svg`, `umh_nbio_dark.svg`) |
 | `src/erg_reader/ui/plot_widget.py` | Interactive PyQtGraph canvas, draggable `A1`/`B1`/`C1` cursors, reference overlays, PNG/SVG export |
 | `src/erg_reader/ui/metrics_table.py` | Retimax-format 2×6 metrics table with highlighted `A1-B1` cell and conditional 30 Hz Flicker bar |
 | `src/erg_reader/ui/sidebar.py` | Editable metadata form, checkable trace list for overlays, branding header, author footer |
