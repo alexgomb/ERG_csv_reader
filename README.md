@@ -151,5 +151,5 @@ QT_QPA_PLATFORM=offscreen pytest -v
 ## Contributors & License
 
 - **Author:** Alejandro Gombau García
-- **Contributors:** [Antigravity](https://github.com/apps/antigravity-for-github) (co-authored commits)
+- **Contributors:** [Gemini](https://github.com/gemini-code-assist) (`@gemini-code-assist`) & [Antigravity](https://github.com/apps/antigravity-for-github)
 - **License:** [MIT License](LICENSE)
