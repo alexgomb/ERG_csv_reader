@@ -14,7 +14,7 @@ from erg_reader.exporters import (
     load_session_json,
     save_session_json,
 )
-from erg_reader.models import DetectionConfig
+from erg_reader.models import DetectionConfig, ERGProtocol
 from erg_reader.parser import load_csv_batch
 
 EXAMPLE_DIR = Path(__file__).resolve().parents[1] / "example_files"
@@ -64,6 +64,7 @@ def test_session_json_save_and_reload_preserves_manual_markers_and_metadata(tmp_
     records = load_csv_batch([EXAMPLE_DIR], config=cfg).records
 
     target = records[1]
+    target.protocol = ERGProtocol.LIGHT_ADAPTED_3_FLICKER
     target.metadata.strain_lastname = "C57BL/6J"
     target.metadata.mouse_id_name = "Mouse-04"
     target.metadata.age = "P21"
@@ -88,6 +89,7 @@ def test_session_json_save_and_reload_preserves_manual_markers_and_metadata(tmp_
     assert loaded_cfg.include_right_od is False
 
     restored = next(r for r in loaded_records if r.record_id == target.record_id)
+    assert restored.protocol == ERGProtocol.LIGHT_ADAPTED_3_FLICKER
     assert restored.metadata.strain_lastname == "C57BL/6J"
     assert restored.metadata.mouse_id_name == "Mouse-04"
     assert restored.metadata.notes == "Verified manually"

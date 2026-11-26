@@ -97,3 +97,32 @@ def test_umh_nbio_svg_branding_and_about_dialog(qtbot) -> None:
         assert "Instituto de Bioingeniería" in texts
         assert "Universidad Miguel Hernández" in texts
 
+
+def test_manual_protocol_selector_toggles_flicker_panel(qtbot) -> None:
+    from erg_reader.models import ERGProtocol
+
+    win = MainWindow(use_settings=False, initial_language="en", initial_theme="light")
+    qtbot.addWidget(win)
+    win.load_example_files()
+
+    da3 = next(r for r in win.records if "Dark-Adapted_3" in r.file_name)
+    win.select_record(da3.record_id)
+    assert da3.protocol == ERGProtocol.DARK_ADAPTED_3
+    assert not win.metrics_panel.flicker_card.isVisibleTo(win.metrics_panel)
+
+    # Manually switch protocol to Flicker in the left sidebar combo box
+    flk_idx = win.sidebar.protocol_combo.findData(ERGProtocol.LIGHT_ADAPTED_3_FLICKER.value)
+    assert flk_idx >= 0
+    win.sidebar.protocol_combo.setCurrentIndex(flk_idx)
+
+    assert da3.protocol == ERGProtocol.LIGHT_ADAPTED_3_FLICKER
+    assert win.metrics_panel.flicker_card.isVisibleTo(win.metrics_panel)
+    assert win.plot_panel.protocol_badge.text() == "LIGHT-ADAPTED 3.0 FLICKER ERG"
+
+    # Switch back to Dark-Adapted 3.0 and verify Flicker panel hides again
+    da3_idx = win.sidebar.protocol_combo.findData(ERGProtocol.DARK_ADAPTED_3.value)
+    win.sidebar.protocol_combo.setCurrentIndex(da3_idx)
+    assert da3.protocol == ERGProtocol.DARK_ADAPTED_3
+    assert not win.metrics_panel.flicker_card.isVisibleTo(win.metrics_panel)
+
+

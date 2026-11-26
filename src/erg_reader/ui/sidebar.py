@@ -6,6 +6,7 @@ from typing import Sequence
 
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
+    QComboBox,
     QFormLayout,
     QFrame,
     QGroupBox,
@@ -20,8 +21,16 @@ from PySide6.QtWidgets import (
 
 from erg_reader import APP_NAME
 from erg_reader.i18n import Translator
-from erg_reader.models import ERGSessionRecord, EyeSide
+from erg_reader.models import ERGProtocol, ERGSessionRecord, EyeSide
 from erg_reader.ui.branding import create_erg_pixmap, render_umh_nbio_pixmap
+
+PROTOCOL_CHOICES: tuple[ERGProtocol, ...] = (
+    ERGProtocol.DARK_ADAPTED_3,
+    ERGProtocol.DARK_ADAPTED_10,
+    ERGProtocol.LIGHT_ADAPTED_3,
+    ERGProtocol.LIGHT_ADAPTED_3_FLICKER,
+    ERGProtocol.UNKNOWN,
+)
 
 
 class SidebarPanel(QFrame):
@@ -30,6 +39,7 @@ class SidebarPanel(QFrame):
     recordSelected = Signal(str)  # record_id
     overlayToggled = Signal(str, bool)  # (record_id, checked)
     metadataEdited = Signal()
+    protocolChanged = Signal(object)  # ERGProtocol
     removeRecordRequested = Signal(str)  # record_id
     clearOverlaysRequested = Signal()
 
@@ -93,6 +103,12 @@ class SidebarPanel(QFrame):
         self.age_edit = QLineEdit()
         self.age_edit.textEdited.connect(self._on_metadata_changed)
 
+        self.protocol_label = QLabel()
+        self.protocol_combo = QComboBox()
+        for proto in PROTOCOL_CHOICES:
+            self.protocol_combo.addItem("", proto.value)
+        self.protocol_combo.currentIndexChanged.connect(self._on_protocol_index_changed)
+
         self.exam_label = QLabel()
         self.exam_edit = QLineEdit()
         self.exam_edit.textEdited.connect(self._on_metadata_changed)
@@ -108,6 +124,7 @@ class SidebarPanel(QFrame):
         form.addRow(self.strain_label, self.strain_edit)
         form.addRow(self.mouse_id_label, self.mouse_id_edit)
         form.addRow(self.age_label, self.age_edit)
+        form.addRow(self.protocol_label, self.protocol_combo)
         form.addRow(self.exam_label, self.exam_edit)
         form.addRow(self.exam_start_label, self.exam_start_edit)
         form.addRow(self.notes_label, self.notes_edit)
@@ -174,6 +191,13 @@ class SidebarPanel(QFrame):
         self.mouse_id_edit.setPlaceholderText(self._tr.tr("placeholder_mouse_id"))
         self.age_label.setText(self._tr.tr("label_age"))
         self.age_edit.setPlaceholderText(self._tr.tr("placeholder_age"))
+        self.protocol_label.setText(self._tr.tr("label_protocol"))
+        self._populating_fields = True
+        try:
+            for idx, proto in enumerate(PROTOCOL_CHOICES):
+                self.protocol_combo.setItemText(idx, self._tr.tr(f"protocol_{proto.value}"))
+        finally:
+            self._populating_fields = False
         self.exam_label.setText(self._tr.tr("label_exam"))
         self.exam_edit.setPlaceholderText(self._tr.tr("placeholder_exam"))
         self.exam_start_label.setText(self._tr.tr("label_exam_start"))
@@ -245,6 +269,7 @@ class SidebarPanel(QFrame):
                 self.strain_edit.clear()
                 self.mouse_id_edit.clear()
                 self.age_edit.clear()
+                self.protocol_combo.setCurrentIndex(0)
                 self.exam_edit.clear()
                 self.exam_start_edit.clear()
                 self.notes_edit.clear()
@@ -254,6 +279,9 @@ class SidebarPanel(QFrame):
                 self.strain_edit.setText(record.metadata.strain_lastname)
                 self.mouse_id_edit.setText(record.metadata.mouse_id_name)
                 self.age_edit.setText(record.metadata.age)
+                proto_idx = self.protocol_combo.findData(record.protocol.value)
+                if proto_idx >= 0:
+                    self.protocol_combo.setCurrentIndex(proto_idx)
                 self.exam_edit.setText(record.metadata.exam)
                 self.exam_start_edit.setText(record.metadata.exam_start)
                 self.notes_edit.setText(record.metadata.notes)
@@ -274,6 +302,7 @@ class SidebarPanel(QFrame):
             self.strain_edit,
             self.mouse_id_edit,
             self.age_edit,
+            self.protocol_combo,
             self.exam_edit,
             self.exam_start_edit,
             self.notes_edit,
@@ -286,6 +315,19 @@ class SidebarPanel(QFrame):
         manual_tag = " · M" if rec.markers.is_manual else ""
         mouse_prefix = f"{rec.metadata.mouse_id_name} — " if rec.metadata.mouse_id_name.strip() else ""
         return f"[{rec.protocol.short_label}]{eye_tag} {mouse_prefix}{rec.file_name}{manual_tag}"
+
+    def _on_protocol_index_changed(self, index: int) -> None:
+        if self._populating_fields or self._active_record is None or index < 0:
+            return
+        raw = self.protocol_combo.itemData(index)
+        if not raw:
+            return
+        try:
+            proto = ERGProtocol(str(raw))
+        except ValueError:
+            return
+        if proto != self._active_record.protocol:
+            self.protocolChanged.emit(proto)
 
     def _on_metadata_changed(self) -> None:
         if self._populating_fields or self._active_record is None:

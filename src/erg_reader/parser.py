@@ -99,6 +99,8 @@ def infer_protocol(file_name: str, time_ms: np.ndarray) -> ERGProtocol:
     low = file_name.lower()
     if "flicker" in low:
         return ERGProtocol.LIGHT_ADAPTED_3_FLICKER
+    if len(time_ms) > 10 and 140.0 <= float(time_ms[-1]) <= 185.0:
+        return ERGProtocol.LIGHT_ADAPTED_3_FLICKER
     if "light" in low or "photopic" in low or re.search(r"\bla[\s_-]?3", low):
         return ERGProtocol.LIGHT_ADAPTED_3
     if "dark" in low or "scotopic" in low or re.search(r"\bda[\s_-]", low):
@@ -106,8 +108,6 @@ def infer_protocol(file_name: str, time_ms: np.ndarray) -> ERGProtocol:
             return ERGProtocol.DARK_ADAPTED_10
         if re.search(r"(?:^|[^0-9])3(?:\.0)?(?:[^0-9]|$)", low):
             return ERGProtocol.DARK_ADAPTED_3
-    if len(time_ms) > 10 and 140.0 <= float(time_ms[-1]) <= 185.0:
-        return ERGProtocol.LIGHT_ADAPTED_3_FLICKER
     return ERGProtocol.UNKNOWN
 
 

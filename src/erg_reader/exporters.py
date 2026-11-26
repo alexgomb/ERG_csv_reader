@@ -232,6 +232,7 @@ def save_session_json(
                 "record_id": rec.record_id,
                 "file_path": rec.file_path,
                 "file_name": rec.file_name,
+                "protocol": rec.protocol.value,
                 "active_channel": rec.active_channel,
                 "overlay_enabled": rec.overlay_enabled,
                 "metadata": rec.metadata.to_dict(),
@@ -247,7 +248,7 @@ def save_session_json(
 def load_session_json(
     session_path: str | Path,
 ) -> tuple[list[ERGSessionRecord], DetectionConfig, str | None, list[str]]:
-    """Reload a saved JSON work session, restoring metadata, active channels, and cursors."""
+    """Reload a saved JSON work session, restoring metadata, protocol, active channels, and cursors."""
     path = Path(session_path)
     data = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(data, dict) or "records" not in data:
@@ -272,6 +273,12 @@ def load_session_json(
             continue
 
         rec.record_id = str(entry.get("record_id", rec.record_id))
+        saved_proto = entry.get("protocol")
+        if saved_proto:
+            try:
+                rec.protocol = ERGProtocol(saved_proto)
+            except ValueError:
+                pass
         saved_channel = entry.get("active_channel")
         if saved_channel in rec.channels:
             rec.active_channel = saved_channel

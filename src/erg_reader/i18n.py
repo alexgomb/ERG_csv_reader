@@ -45,6 +45,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "placeholder_mouse_id": "e.g. C57 P21",
         "label_age": "Age",
         "placeholder_age": "e.g. P21 / 1m",
+        "label_protocol": "Protocol",
         "label_exam": "Exam",
         "placeholder_exam": "e.g. DARK-ADAPTED 3.0 ERG",
         "label_exam_start": "Exam Start",
@@ -162,8 +163,8 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "protocol_dark_adapted_3": "Dark-Adapted 3.0",
         "protocol_dark_adapted_10": "Dark-Adapted 10.0",
         "protocol_light_adapted_3": "Light-Adapted 3.0",
-        "protocol_light_adapted_3_flicker": "Light-Adapted 3.0 Flicker",
-        "protocol_unknown": "Custom / Unknown",
+        "protocol_light_adapted_3_flicker": "Flicker 30 Hz",
+        "protocol_unknown": "Custom / Other",
     },
     "es": {
         "app_title": "nBio ERG-Trace — Analizador de ERG Murino",
@@ -205,6 +206,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "placeholder_mouse_id": "ej. C57 P21",
         "label_age": "Edad",
         "placeholder_age": "ej. P21 / 1m",
+        "label_protocol": "Protocolo",
         "label_exam": "Examen",
         "placeholder_exam": "ej. DARK-ADAPTED 3.0 ERG",
         "label_exam_start": "Inicio examen",
@@ -322,8 +324,8 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "protocol_dark_adapted_3": "Dark-Adapted 3.0",
         "protocol_dark_adapted_10": "Dark-Adapted 10.0",
         "protocol_light_adapted_3": "Light-Adapted 3.0",
-        "protocol_light_adapted_3_flicker": "Light-Adapted 3.0 Flicker",
-        "protocol_unknown": "Personalizado / Otro",
+        "protocol_light_adapted_3_flicker": "Flicker 30 Hz",
+        "protocol_unknown": "Personalizado",
     },
 }
 

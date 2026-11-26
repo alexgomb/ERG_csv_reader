@@ -99,3 +99,13 @@ def test_invalid_csv_raises_parse_error(tmp_path: Path) -> None:
     bad.write_text("col1,col2\n1,2\n3,4\n5,6\n7,8\n", encoding="utf-8")
     with pytest.raises(ERGParseError):
         parse_retimax_csv(bad)
+
+
+def test_renamed_flicker_csv_detected_by_duration_over_light_keyword(tmp_path: Path) -> None:
+    sample = (EXAMPLE_DIR / "Light-Adapted_3_Flicker_ERG_LEFT - OS.csv").read_bytes()
+    renamed = tmp_path / "Light_mouse01_OS.csv"
+    renamed.write_bytes(sample)
+
+    rec = parse_retimax_csv(renamed)
+    assert rec.protocol == ERGProtocol.LIGHT_ADAPTED_3_FLICKER
+

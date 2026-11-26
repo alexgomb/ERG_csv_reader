@@ -22,7 +22,7 @@
 
 2. **Retimax-Inspired Left-Eye Desktop Interface**
    - Three-column desktop layout inspired by CSO Retimax (`Interfaz.png`), adapted specifically for left-eye CSV review without hardware acquisition controls (IR Camera, Start/Pause, Impedance).
-   - **Left Sidebar:** Editable subject/exam metadata (`Strain / Lastname`, `Mouse ID / Name`, `Age`, `Exam`, read-only `Exam Start`, `Notes` — auto-inferred from parent folder and filename when applicable), interactive loaded-trace list with checkboxes to overlay reference curves (`GNS` style), and visible author credit.
+   - **Left Sidebar:** Editable subject/exam metadata (`Strain / Lastname`, `Mouse ID / Name`, `Age`, manual `Protocol` selector, `Exam`, read-only `Exam Start`, `Notes` — auto-inferred from parent folder and filename when applicable), interactive loaded-trace list with checkboxes to overlay reference curves (`GNS` style), institutional UMH · nBio SVG logo, and visible author credit.
    - **Center Workspace:** Interactive `LEFT - OS` PyQtGraph waveform canvas with Retimax grid, zero baseline, floating channel badge (`AV1`), reference overlays, draggable `A1`/`B1`/`C1` cursors snapped to real samples, and Retimax-format metrics table underneath (`Amplitude (µV)` and `Peak time (ms)` for `A1`, `B1`, `C1`, highlighted `A1-B1`, and `B1-C1`).
    - **Right Control Strip:** File loading (`Open CSV Files`, `Folder`, `Examples`), pure display controls (trace column selector, `±250 µV` preset, magnifier & `▲`/`▼` scale steps, `Auto-Scale`, `Reset View`, `Grid` toggle), marker actions (`Auto-Detect`, `Settings`), export buttons (`Copy Table`, `Save Plot`, `CSV`, `Excel`), quick `EN`/`ES` language toggle, `Light`/`Dark` theme toggle, and `About` dialog.
 

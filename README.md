@@ -132,6 +132,15 @@ QT_QPA_PLATFORM=offscreen pytest -v
 
 ## Changelog
 
+### [0.1.2] — 2026-11-26
+
+#### Added
+- Manual **Protocol** selector dropdown in the left sidebar (`Dark-Adapted 3.0`, `Dark-Adapted 10.0`, `Light-Adapted 3.0`, `Light-Adapted 3.0 Flicker`, `Custom / Unknown`) to override automatic protocol classification at any time, immediately toggling the 30 Hz Flicker analysis bar and recalculating automatic markers while preserving manual cursor edits.
+- Manual protocol overrides are now saved and restored inside `.json` work sessions.
+
+#### Improved
+- Prioritized the 140–185 ms recording duration check in `infer_protocol` so renamed 30 Hz Flicker CSVs without `"flicker"` in their filename are still auto-detected accurately.
+
 ### [0.1.1] — 2026-11-26
 
 #### Added

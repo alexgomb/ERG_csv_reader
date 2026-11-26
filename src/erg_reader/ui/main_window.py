@@ -30,7 +30,7 @@ from erg_reader.exporters import (
     save_session_json,
 )
 from erg_reader.i18n import SUPPORTED_LANGUAGES, Translator
-from erg_reader.models import DetectionConfig, ERGSessionRecord
+from erg_reader.models import DetectionConfig, ERGProtocol, ERGSessionRecord
 from erg_reader.parser import load_csv_batch
 from erg_reader.themes import SUPPORTED_THEMES, get_stylesheet
 from erg_reader.ui.branding import create_erg_icon
@@ -289,6 +289,7 @@ class MainWindow(QMainWindow):
         self.sidebar.recordSelected.connect(self.select_record)
         self.sidebar.overlayToggled.connect(self.toggle_overlay)
         self.sidebar.metadataEdited.connect(self._on_metadata_edited)
+        self.sidebar.protocolChanged.connect(self._on_protocol_changed)
         self.sidebar.removeRecordRequested.connect(self.remove_record)
         self.sidebar.clearOverlaysRequested.connect(self.clear_overlays)
 
@@ -589,6 +590,21 @@ class MainWindow(QMainWindow):
             overlays=self._overlay_records(),
             preserve_range=True,
         )
+
+    def _on_protocol_changed(self, protocol: ERGProtocol) -> None:
+        rec = self.active_record
+        if rec is None or rec.protocol == protocol:
+            return
+        old_default_exam = rec.protocol.display_name
+        rec.protocol = protocol
+        if not rec.metadata.exam.strip() or rec.metadata.exam.strip().upper() == old_default_exam:
+            rec.metadata.exam = protocol.display_name
+        if not rec.markers.is_manual:
+            rec.markers = auto_detect_markers(rec.time_ms, rec.active_signal, rec.protocol, self.config)
+        self.sidebar.set_active_record(rec)
+        self.sidebar.update_record_label(rec)
+        self.plot_panel.set_data(rec, overlays=self._overlay_records(), preserve_range=True)
+        self.metrics_panel.set_record(rec)
 
     def _on_marker_moved(self, _marker_key: str, _sample_idx: int) -> None:
         rec = self.active_record
