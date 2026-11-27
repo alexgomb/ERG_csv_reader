@@ -348,6 +348,6 @@ VITE_BASE=/ERG_csv_reader/ npm --prefix web run build
 
 ## Contributors & License
 
-- **Author:** Alejandro Gombau García · Grupo nBio, Instituto de Bioingeniería, Universidad Miguel Hernández
+- **Author:** Alejandro Gombau García ([GitHub](https://github.com/alexgomb) · [LinkedIn](https://www.linkedin.com/in/alejandro-gombau/)) · Grupo nBio, Instituto de Bioingeniería, Universidad Miguel Hernández
 - **Contributors:** [Gemini](https://github.com/gemini-code-assist) (`@gemini-code-assist`) & [Antigravity](https://github.com/apps/antigravity-for-github)
 - **License:** [MIT License](LICENSE)

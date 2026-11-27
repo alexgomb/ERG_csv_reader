@@ -114,6 +114,12 @@ describe('nBio ERG-Trace Web UI Integration', () => {
     )
     expect(screen.getByRole('dialog')).toHaveTextContent('Alejandro Gombau García')
     expect(screen.getByRole('dialog')).toHaveTextContent('C57BL/6')
+    const ghLink = document.getElementById('about-github-link') as HTMLAnchorElement
+    const liLink = document.getElementById('about-linkedin-link') as HTMLAnchorElement
+    expect(ghLink.href).toBe('https://github.com/alexgomb')
+    expect(liLink.href).toBe('https://www.linkedin.com/in/alejandro-gombau/')
+    expect(ghLink.querySelector('svg')).not.toBeNull()
+    expect(liLink.querySelector('svg')).not.toBeNull()
     await user.click(document.getElementById('about-close-btn')!)
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
 

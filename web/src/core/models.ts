@@ -8,6 +8,8 @@ export const APP_AUTHOR = 'Alejandro Gombau García'
 export const APP_LICENSE = 'MIT'
 export const REPO_URL = 'https://github.com/alexgomb/ERG_csv_reader'
 export const NBIO_URL = 'http://nbio.umh.es'
+export const AUTHOR_GITHUB_URL = 'https://github.com/alexgomb'
+export const AUTHOR_LINKEDIN_URL = 'https://www.linkedin.com/in/alejandro-gombau/'
 
 export type EyeSide = 'LEFT - OS' | 'RIGHT - OD' | 'UNKNOWN'
 

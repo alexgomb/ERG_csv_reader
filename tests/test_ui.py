@@ -98,13 +98,17 @@ def test_umh_nbio_svg_branding_and_about_dialog(qtbot) -> None:
         assert not pix.isNull()
         assert pix.width() > 200
 
-    for lang in ("en", "es"):
-        dlg = AboutDialog(Translator(lang), theme="light")
+    for lang, theme in (("en", "light"), ("es", "dark")):
+        dlg = AboutDialog(Translator(lang), theme=theme)
         qtbot.addWidget(dlg)
         texts = " ".join(lbl.text() for lbl in dlg.findChildren(QLabel))
         assert "Grupo nBio" in texts
         assert "Instituto de Bioingeniería" in texts
         assert "Universidad Miguel Hernández" in texts
+        assert dlg.github_btn.toolTip() == "https://github.com/alexgomb"
+        assert dlg.linkedin_btn.toolTip() == "https://www.linkedin.com/in/alejandro-gombau/"
+        assert not dlg.github_btn.icon().isNull()
+        assert not dlg.linkedin_btn.icon().isNull()
 
 
 def test_manual_protocol_selector_toggles_flicker_and_op_panels(qtbot) -> None:

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QFont
+from PySide6.QtCore import QSize, Qt, QUrl
+from PySide6.QtGui import QDesktopServices, QFont
 from PySide6.QtWidgets import (
     QCheckBox,
     QDialog,
@@ -17,7 +17,15 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
 )
 
-from erg_reader import APP_NAME, REPO_URL, __author__, __license__, __version__
+from erg_reader import (
+    APP_NAME,
+    AUTHOR_GITHUB_URL,
+    AUTHOR_LINKEDIN_URL,
+    REPO_URL,
+    __author__,
+    __license__,
+    __version__,
+)
 from erg_reader.i18n import Translator
 from erg_reader.models import (
     DetectionConfig,
@@ -25,7 +33,11 @@ from erg_reader.models import (
     ERGProtocol,
     default_detection_windows,
 )
-from erg_reader.ui.branding import create_erg_pixmap, render_umh_nbio_pixmap
+from erg_reader.ui.branding import (
+    create_erg_pixmap,
+    create_social_icon,
+    render_umh_nbio_pixmap,
+)
 
 PROTOCOL_ORDER = (
     ERGProtocol.DARK_ADAPTED_3,
@@ -223,6 +235,53 @@ class AboutDialog(QDialog):
         repo_lbl.setOpenExternalLinks(True)
         info_form.addRow(self._tr.tr("about_repo_label"), repo_lbl)
         layout.addLayout(info_form)
+
+        # Elegant author social links (GitHub & LinkedIn) with crisp vector icons
+        social_row = QHBoxLayout()
+        social_row.setSpacing(10)
+        pill_bg = "#1E293B" if is_dark else "#F8FAFC"
+        pill_border = "#334155" if is_dark else "#CBD5E1"
+        pill_text = "#F1F5F9" if is_dark else "#0F172A"
+        pill_hover_gh = "#334155" if is_dark else "#EFF6FF"
+        pill_hover_li = "#0C4A6E" if is_dark else "#EBF5FF"
+        pill_border_li = "#38BDF8" if is_dark else "#0A66C2"
+
+        self.github_btn = QPushButton("  GitHub · @alexgomb")
+        self.github_btn.setObjectName("AboutGitHubButton")
+        self.github_btn.setIcon(create_social_icon("github", size=17, dark_mode=is_dark))
+        self.github_btn.setIconSize(QSize(17, 17))
+        self.github_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.github_btn.setToolTip(AUTHOR_GITHUB_URL)
+        self.github_btn.setStyleSheet(
+            f"QPushButton {{ background: {pill_bg}; color: {pill_text}; "
+            f"border: 1px solid {pill_border}; border-radius: 16px; "
+            f"padding: 6px 14px; font-weight: 600; }}"
+            f"QPushButton:hover {{ background: {pill_hover_gh}; border-color: {link_color}; }}"
+        )
+        self.github_btn.clicked.connect(
+            lambda: QDesktopServices.openUrl(QUrl(AUTHOR_GITHUB_URL))
+        )
+
+        self.linkedin_btn = QPushButton("  LinkedIn · Alejandro Gombau")
+        self.linkedin_btn.setObjectName("AboutLinkedInButton")
+        self.linkedin_btn.setIcon(create_social_icon("linkedin", size=17, dark_mode=is_dark))
+        self.linkedin_btn.setIconSize(QSize(17, 17))
+        self.linkedin_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.linkedin_btn.setToolTip(AUTHOR_LINKEDIN_URL)
+        self.linkedin_btn.setStyleSheet(
+            f"QPushButton {{ background: {pill_bg}; color: {pill_text}; "
+            f"border: 1px solid {pill_border}; border-radius: 16px; "
+            f"padding: 6px 14px; font-weight: 600; }}"
+            f"QPushButton:hover {{ background: {pill_hover_li}; border-color: {pill_border_li}; }}"
+        )
+        self.linkedin_btn.clicked.connect(
+            lambda: QDesktopServices.openUrl(QUrl(AUTHOR_LINKEDIN_URL))
+        )
+
+        social_row.addWidget(self.github_btn)
+        social_row.addWidget(self.linkedin_btn)
+        social_row.addStretch(1)
+        layout.addLayout(social_row)
 
         btn_row = QHBoxLayout()
         btn_row.addStretch(1)
