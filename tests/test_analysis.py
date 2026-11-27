@@ -10,6 +10,7 @@ import pytest
 from erg_reader.analysis import (
     auto_detect_markers,
     compute_flicker_metrics,
+    compute_op_metrics,
     compute_peak_metrics,
     snap_time_to_index,
 )
@@ -44,10 +45,11 @@ def test_retimax_exact_values_on_reference_da3_markers() -> None:
     assert metrics.b1_c1_ms == pytest.approx(81.05, abs=0.02)
 
 
-def test_auto_detection_all_four_left_eye_protocols() -> None:
+def test_auto_detection_all_five_left_eye_protocols() -> None:
     expected = {
         "Dark-Adapted_3_ERG_RIGHT_LEFT - OS.csv": (28.32, 62.50, 353.91),
         "Dark-Adapted_10_ERG_LEFT - OS.csv": (21.00, 50.29, 366.53),
+        "Dark-Adapted_3_OSCILLATORY_POTENTIAL_ERG_LEFT - OS.csv": (27.34, 32.71, 20.45),
         "Light-Adapted_3_ERG_LEFT - OS.csv": (20.51, 56.15, 48.33),
         "Light-Adapted_3_Flicker_ERG_LEFT - OS.csv": (29.30, 44.92, 13.71),
     }
@@ -78,3 +80,34 @@ def test_flicker_metrics_on_real_and_synthetic_30hz_signal() -> None:
     assert syn.dominant_freq_hz == pytest.approx(30.0, abs=0.5)
     assert syn.fft_fundamental_amp_uv == pytest.approx(10.0, abs=0.2)
     assert syn.mean_peak_to_trough_uv == pytest.approx(20.0, abs=0.2)
+
+
+def test_oscillatory_potentials_metrics_real_and_edge_cases() -> None:
+    rec = parse_retimax_csv(EXAMPLE_DIR / "Dark-Adapted_3_OSCILLATORY_POTENTIAL_ERG_LEFT - OS.csv")
+    ops = compute_op_metrics(rec.time_ms, rec.active_signal)
+
+    assert ops.op_count == 4
+    assert ops.sum_op_amplitude_uv == pytest.approx(66.06, abs=0.1)
+    assert ops.max_op_amplitude_uv == pytest.approx(23.20, abs=0.1)
+    assert ops.dominant_freq_hz == pytest.approx(100.0, abs=2.0)
+    assert list(ops.op_peak_times_ms) == sorted(ops.op_peak_times_ms)
+
+    # Edge cases: short (<8 samples), flat signal, and dt=0
+    short = compute_op_metrics(np.array([0.0, 1.0, 2.0]), np.array([0.0, 5.0, 0.0]))
+    assert short.op_count == 0
+    assert short.sum_op_amplitude_uv == 0.0
+
+    t_ms = np.linspace(0.0, 250.0, 512, endpoint=False)
+    flat = compute_op_metrics(t_ms, np.full_like(t_ms, 3.0))
+    assert flat.op_count == 0
+    assert flat.sum_op_amplitude_uv == 0.0
+
+    zero_dt = compute_op_metrics(np.zeros(64), np.zeros(64))
+    assert zero_dt.op_count == 0
+
+    # Synthetic 100 Hz OP burst (amplitude 10 uV -> peak-to-trough 20 uV per wavelet)
+    syn_y = 10.0 * np.sin(2.0 * np.pi * 100.0 * (t_ms / 1000.0))
+    syn = compute_op_metrics(t_ms, syn_y)
+    assert syn.op_count == 4
+    assert syn.dominant_freq_hz == pytest.approx(100.0, abs=2.0)
+    assert syn.sum_op_amplitude_uv == pytest.approx(80.0, abs=3.0)

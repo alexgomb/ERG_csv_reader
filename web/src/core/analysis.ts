@@ -9,6 +9,7 @@ import {
   type ERGProtocol,
   type FlickerMetrics,
   type MarkerIndices,
+  type OPMetrics,
   type PeakMetrics,
 } from './models'
 
@@ -156,13 +157,14 @@ export function autoDetectMarkers(
   }
 
   // 3. C1: post-b-wave reference / trough inside C1 window
-  const minGap = protocol === 'light_adapted_3_flicker' ? 6.0 : 15.0
+  const minGap =
+    protocol === 'dark_adapted_3_ops' ? 4.0 : protocol === 'light_adapted_3_flicker' ? 6.0 : 15.0
   const cStart = Math.max(win.c_min_ms, timeMs[b1Idx] + minGap)
   const cEnd = Math.max(win.c_max_ms, cStart + 5.0)
   const cCandidates = windowIndices(timeMs, cStart, cEnd)
 
   let c1Idx = cCandidates[0]
-  if (protocol === 'light_adapted_3_flicker') {
+  if (protocol === 'light_adapted_3_flicker' || protocol === 'dark_adapted_3_ops') {
     for (const idx of cCandidates) {
       if (signalUv[idx] < signalUv[c1Idx]) {
         c1Idx = idx
@@ -409,6 +411,119 @@ export function computeFlickerMetrics(
     dominant_freq_hz: domFreq,
     cycles_detected: cycles,
     first_peak_time_ms: firstPeakMs,
+  }
+}
+
+export function computeOpMetrics(
+  timeMs: readonly number[],
+  signalUv: readonly number[],
+  windowStartMs = 15.0,
+  windowEndMs = 65.0,
+  maxWavelets = 4,
+): OPMetrics {
+  const n = timeMs.length
+  if (n < 8) {
+    return {
+      op_amplitudes_uv: [],
+      op_peak_times_ms: [],
+      sum_op_amplitude_uv: 0.0,
+      max_op_amplitude_uv: 0.0,
+      dominant_freq_hz: 0.0,
+      fft_band_amp_uv: 0.0,
+      op_count: 0,
+    }
+  }
+
+  const diffs: number[] = []
+  for (let i = 1; i < n; i++) {
+    diffs.push(timeMs[i] - timeMs[i - 1])
+  }
+  const dtMs = median(diffs)
+  const fsHz = dtMs > 0 ? 1000.0 / dtMs : 1000.0
+
+  const winIndices: number[] = []
+  for (let i = 0; i < n; i++) {
+    if (timeMs[i] >= windowStartMs && timeMs[i] <= windowEndMs) {
+      winIndices.push(i)
+    }
+  }
+
+  const opAmps: number[] = []
+  const opTimes: number[] = []
+
+  if (winIndices.length >= 3) {
+    const seg = winIndices.map((idx) => signalUv[idx])
+    let segSum = 0.0
+    for (const v of seg) segSum += v
+    const segMean = segSum / seg.length
+    let segVar = 0.0
+    for (const v of seg) {
+      const d = v - segMean
+      segVar += d * d
+    }
+    const segStd = Math.sqrt(segVar / seg.length)
+    const minDist = Math.max(3, Math.round(0.006 * fsHz))
+    const prominence = Math.max(0.35 * segStd, 1.5)
+    const relPeaks = findPeaks1D(seg, { distance: minDist, prominence })
+    const peaks = relPeaks.slice(0, maxWavelets).map((p) => winIndices[p])
+
+    const winStartIdx = winIndices[0]
+    for (let i = 0; i < peaks.length; i++) {
+      const pk = peaks[i]
+      const searchStart = i > 0 ? peaks[i - 1] : winStartIdx
+      let troughIdx = searchStart
+      for (let j = searchStart + 1; j <= pk; j++) {
+        if (signalUv[j] < signalUv[troughIdx]) {
+          troughIdx = j
+        }
+      }
+      opAmps.push(signalUv[pk] - signalUv[troughIdx])
+      opTimes.push(timeMs[pk])
+    }
+  }
+
+  // Exact single-sided FFT dominant component in 60-200 Hz ISCEV OP band
+  let sum = 0.0
+  for (let i = 0; i < n; i++) sum += signalUv[i]
+  const meanVal = sum / n
+  const centered = signalUv.map((v) => v - meanVal)
+  const mags = realDftMagnitudes(centered)
+  const spectrum = mags.map((m) => (2.0 / n) * m)
+  const df = fsHz / n
+
+  let bestIdx = spectrum.length > 1 ? 1 : 0
+  let foundInBand = false
+  for (let k = 0; k < spectrum.length; k++) {
+    const f = k * df
+    if (f >= 60.0 && f <= 200.0) {
+      if (!foundInBand || spectrum[k] > spectrum[bestIdx]) {
+        bestIdx = k
+        foundInBand = true
+      }
+    }
+  }
+  if (!foundInBand && spectrum.length > 1) {
+    bestIdx = 1
+    for (let k = 2; k < spectrum.length; k++) {
+      if (spectrum[k] > spectrum[bestIdx]) bestIdx = k
+    }
+  }
+
+  let sumOp = 0.0
+  let maxOp = 0.0
+  for (const a of opAmps) {
+    sumOp += a
+    if (a > maxOp) maxOp = a
+  }
+
+  return {
+    op_amplitudes_uv: opAmps,
+    op_peak_times_ms: opTimes,
+    sum_op_amplitude_uv: sumOp,
+    max_op_amplitude_uv: maxOp,
+    dominant_freq_hz: bestIdx * df,
+    fft_band_amp_uv: spectrum[bestIdx] ?? 0.0,
+    op_count: opAmps.length,
   }
 }
 

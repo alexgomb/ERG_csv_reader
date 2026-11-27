@@ -78,6 +78,14 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "flicker_fft_pp": "FFT Peak-to-Peak",
         "flicker_dom_freq": "Dominant Freq",
         "flicker_cycles": "Cycles",
+        "op_panel_title": "Oscillatory Potentials Analysis (OP1–OP4 · Raw Signal)",
+        "op_sum": "Sum OPs (∑OP)",
+        "op_1": "OP1",
+        "op_2": "OP2",
+        "op_3": "OP3",
+        "op_4": "OP4",
+        "op_dom_freq": "Dominant Freq",
+        "op_count": "Wavelets",
         # Right Controls Panel
         "ctrl_files_group": "Files",
         "btn_open_csv": "Open CSV Files",
@@ -123,7 +131,8 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
             "murine recordings exported as CSV from the CSO Retimax system.\n\n"
             "• Left-eye (LEFT - OS) focused workflow with raw 1:1 signal fidelity\n"
             "• Protocol-aware A1, B1, C1 detection and interactive draggable cursors\n"
-            "• Dedicated 30 Hz Flicker peak-to-trough & FFT analysis\n"
+            "• Dedicated Oscillatory Potentials (OP1–OP4) and 30 Hz Flicker FFT analysis\n"
+            "• Bundled example dataset: C57BL/6 mouse at postnatal day 21 (P21)\n"
             "• Batch CSV / Excel export, PNG / SVG plot export, and JSON work sessions"
         ),
         "about_author_label": "Author:",
@@ -135,7 +144,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "about_repo_label": "Repository:",
         "about_close": "Close",
         # Status / Messages
-        "status_ready": "Ready — Drop CSO Retimax CSV files or load examples to start.",
+        "status_ready": "Ready — Drop CSO Retimax CSV files or load C57BL/6 P21 examples to start.",
         "status_loaded": "Loaded {loaded} trace(s) ({skipped} RIGHT - OD skipped).",
         "status_loaded_no_skip": "Loaded {loaded} trace(s).",
         "status_all_skipped_od": "Skipped {skipped} RIGHT - OD file(s). Enable RIGHT - OD in Settings to inspect them.",
@@ -162,6 +171,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "dialog_load_session_title": "Open ERG Work Session",
         "protocol_dark_adapted_3": "Dark-Adapted 3.0",
         "protocol_dark_adapted_10": "Dark-Adapted 10.0",
+        "protocol_dark_adapted_3_ops": "Oscillatory Potentials (OPs)",
         "protocol_light_adapted_3": "Light-Adapted 3.0",
         "protocol_light_adapted_3_flicker": "Flicker 30 Hz",
         "protocol_unknown": "Custom / Other",
@@ -239,6 +249,14 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "flicker_fft_pp": "FFT Pico-Pico",
         "flicker_dom_freq": "Frec. dominante",
         "flicker_cycles": "Ciclos",
+        "op_panel_title": "Análisis Potenciales Oscilatorios (OP1–OP4 · Señal cruda)",
+        "op_sum": "Suma OPs (∑OP)",
+        "op_1": "OP1",
+        "op_2": "OP2",
+        "op_3": "OP3",
+        "op_4": "OP4",
+        "op_dom_freq": "Frec. dominante",
+        "op_count": "Ondículas",
         # Right Controls Panel
         "ctrl_files_group": "Archivos",
         "btn_open_csv": "Abrir archivos CSV",
@@ -284,7 +302,8 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
             "murina exportados en CSV desde el sistema CSO Retimax.\n\n"
             "• Flujo enfocado en ojo izquierdo (LEFT - OS) con fidelidad 1:1 de la señal cruda\n"
             "• Auto-detección de A1, B1, C1 por protocolo y cursores interactivos arrastrables\n"
-            "• Análisis dedicado de Flicker a 30 Hz (pico-valle medio y FFT fundamental)\n"
+            "• Análisis dedicado de Potenciales Oscilatorios (OP1–OP4) y Flicker a 30 Hz (FFT)\n"
+            "• Archivos de ejemplo incluidos: ratón C57BL/6 a 21 días post natal (P21)\n"
             "• Exportación por lotes a CSV / Excel, gráficas PNG / SVG y sesiones de trabajo JSON"
         ),
         "about_author_label": "Autor:",
@@ -296,7 +315,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "about_repo_label": "Repositorio:",
         "about_close": "Cerrar",
         # Status / Messages
-        "status_ready": "Listo — Arrastra archivos CSV de CSO Retimax o carga los ejemplos para empezar.",
+        "status_ready": "Listo — Arrastra archivos CSV de CSO Retimax o carga los ejemplos (C57BL/6 P21) para empezar.",
         "status_loaded": "Cargadas {loaded} curva(s) ({skipped} de RIGHT - OD omitidas).",
         "status_loaded_no_skip": "Cargadas {loaded} curva(s).",
         "status_all_skipped_od": "Se omitieron {skipped} archivo(s) de RIGHT - OD. Activa RIGHT - OD en Ajustes si deseas inspeccionarlos.",
@@ -323,6 +342,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "dialog_load_session_title": "Abrir sesión de trabajo ERG",
         "protocol_dark_adapted_3": "Dark-Adapted 3.0",
         "protocol_dark_adapted_10": "Dark-Adapted 10.0",
+        "protocol_dark_adapted_3_ops": "Potenciales Oscilatorios (OPs)",
         "protocol_light_adapted_3": "Light-Adapted 3.0",
         "protocol_light_adapted_3_flicker": "Flicker 30 Hz",
         "protocol_unknown": "Personalizado",

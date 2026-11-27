@@ -31,17 +31,18 @@
 3. **Scientific Signal Integrity (No Filtering / No Baseline Alteration)**
    - **Never** apply low-pass smoothing, baseline offset subtraction, or amplitude resampling to the displayed or measured trace. All reported amplitudes and peak times must match the raw CSO Retimax CSV samples 1:1.
 
-4. **Protocol-Aware Peak Detection, Manual Override & Flicker Analysis**
-   - Automatically identifies murine protocols (`Dark-Adapted 3.0`, `Dark-Adapted 10.0`, `Light-Adapted 3.0`, `Light-Adapted 3.0 Flicker`, `Custom / Unknown`), prioritizing the 140–185 ms recording duration for 30 Hz Flicker so renamed Flicker CSVs are still recognized.
-   - Users can override the protocol at any time via the sidebar `Protocol` dropdown, which immediately toggles the 30 Hz Flicker analysis bar and recalculates automatic markers (while preserving manual cursor edits).
+4. **Protocol-Aware Peak Detection, Manual Override, Oscillatory Potentials & Flicker Analysis**
+   - Automatically identifies all five murine protocols (`Dark-Adapted 3.0`, `Dark-Adapted 10.0`, `Dark-Adapted 3.0 Oscillatory Potentials`, `Light-Adapted 3.0`, `Light-Adapted 3.0 Flicker`, plus `Custom / Unknown`), prioritizing the 140–185 ms recording duration for 30 Hz Flicker and checking `oscillatory` / `oscilatorio` / `ops` before `dark_adapted_3`.
+   - Users can override the protocol at any time via the sidebar `Protocol` dropdown, which immediately toggles the dedicated **Oscillatory Potentials (`OP1–OP4`)** or **30 Hz Flicker** analysis bar and recalculates automatic markers (while preserving manual cursor edits).
    - Dragging any marker updates table metrics live and marks the trace as `Manual`; `Auto-Detect` restores automatic placement.
+   - For **Oscillatory Potentials (`dark_adapted_3_ops`)**, displays a non-destructive `OP1–OP4` analysis bar (`15–65 ms` ascending-b-wave window: summed `∑OPs` amplitude, individual `OP1–OP4` trough-to-peak amplitudes & peak times, dominant `60–200 Hz` FFT frequency, and wavelet count).
    - For **30 Hz Flicker** protocols, displays an additional non-destructive analysis bar with cycle mean peak-to-trough amplitude (± SD), FFT fundamental amplitude (~30 Hz), FFT peak-to-peak amplitude, dominant frequency (Hz), and detected cycle count.
-   - **Cross-Platform Golden Parity Contract:** `tests/golden_metrics.json` captures exact Python-computed markers, `peak_metrics`, and `flicker_metrics` across all 8 bundled CSO Retimax CSVs. The TypeScript web engine (`web/src/core/analysis.ts`, including SciPy-compatible `findPeaks1D` and exact real DFT) MUST pass 1:1 numerical parity against `tests/golden_metrics.json` in CI.
+   - **Cross-Platform Golden Parity Contract:** `tests/golden_metrics.json` captures exact Python-computed markers, `peak_metrics`, `flicker_metrics`, and `op_metrics` across all **10** bundled CSO Retimax CSVs (recorded from a **C57BL/6 mouse at postnatal day 21 · P21**). The TypeScript web engine (`web/src/core/analysis.ts`, including SciPy-compatible `findPeaks1D` and exact real DFT) MUST pass 1:1 numerical parity against `tests/golden_metrics.json` in CI.
 
 5. **Batch Loading, Export & Session Persistence**
-   - Supports drag-and-drop and dialogs for single CSVs, multiple CSVs, recursive folders/subfolders, and bundled `example_files/`.
-   - Batch export of all loaded records to UTF-8 CSV (27 columns) and styled Excel (`.xlsx`, highlighting `A1-B1` amplitude and including an `Export Info` sheet).
-   - Clipboard TSV copy for the active table, high-resolution **PNG** and native **SVG** plot export, and **JSON** work sessions preserving cursor indices, protocol overrides, metadata, active channels, overlays, and detection windows (the web app embeds waveforms inside exported JSON so sessions reload offline without re-selecting CSVs, and can also match desktop-exported JSON sessions to currently loaded CSVs).
+   - Supports drag-and-drop and dialogs for single CSVs, multiple CSVs, recursive folders/subfolders, and bundled C57BL/6 P21 `example_files/`.
+   - Batch export of all loaded records to UTF-8 CSV (34 columns including `A1`/`B1`/`C1`, Flicker, and `OP1–OP4`/`∑OPs`) and styled Excel (`.xlsx`, highlighting `A1-B1` amplitude and including an `Export Info` sheet).
+   - Clipboard TSV copy for the active table (with optional Flicker or OP section), high-resolution **PNG** and native **SVG** plot export, and **JSON** work sessions preserving cursor indices, protocol overrides, metadata, active channels, overlays, and detection windows (the web app embeds waveforms inside exported JSON so sessions reload offline without re-selecting CSVs, and can also match desktop-exported JSON sessions to currently loaded CSVs).
 
 6. **Bilingual UI, Themes, Packaging & Deployment**
    - Live switchable **English (`en`)** and **Spanish (`es`)** UI (default English) with automated 100% EN/ES key parity checks on both platforms.

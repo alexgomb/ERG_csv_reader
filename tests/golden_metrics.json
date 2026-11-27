@@ -23,7 +23,8 @@
       "b1_c1_uv": 164.04419,
       "b1_c1_ms": 60.546875
     },
-    "flicker_metrics": null
+    "flicker_metrics": null,
+    "op_metrics": null
   },
   "Dark-Adapted_10_ERG_RIGHT - OD.csv": {
     "eye": "RIGHT - OD",
@@ -49,7 +50,8 @@
       "b1_c1_uv": 5.999756,
       "b1_c1_ms": 35.15625
     },
-    "flicker_metrics": null
+    "flicker_metrics": null,
+    "op_metrics": null
   },
   "Dark-Adapted_3_ERG_RIGHT_LEFT - OS.csv": {
     "eye": "LEFT - OS",
@@ -75,7 +77,8 @@
       "b1_c1_uv": 206.127929,
       "b1_c1_ms": 67.871094
     },
-    "flicker_metrics": null
+    "flicker_metrics": null,
+    "op_metrics": null
   },
   "Dark-Adapted_3_ERG_RIGHT_RIGHT - OD.csv": {
     "eye": "RIGHT - OD",
@@ -101,7 +104,98 @@
       "b1_c1_uv": 13.549804,
       "b1_c1_ms": 25.390625
     },
-    "flicker_metrics": null
+    "flicker_metrics": null,
+    "op_metrics": null
+  },
+  "Dark-Adapted_3_OSCILLATORY_POTENTIAL_ERG_LEFT - OS.csv": {
+    "eye": "LEFT - OS",
+    "protocol": "dark_adapted_3_ops",
+    "exam_start": "23/10/2026 11:27:00",
+    "active_channel": "AV1(uV)",
+    "n_samples": 512,
+    "markers": {
+      "a1_idx": 56,
+      "b1_idx": 67,
+      "c1_idx": 77,
+      "is_manual": false
+    },
+    "peak_metrics": {
+      "a1_uv": -8.646216,
+      "a1_ms": 27.34375,
+      "b1_uv": 11.801151,
+      "b1_ms": 32.714844,
+      "c1_uv": -11.770658,
+      "c1_ms": 37.597656,
+      "a1_b1_uv": 20.447367,
+      "a1_b1_ms": 5.371094,
+      "b1_c1_uv": 23.571809,
+      "b1_c1_ms": 4.882812
+    },
+    "flicker_metrics": null,
+    "op_metrics": {
+      "op_amplitudes_uv": [
+        11.754596,
+        20.447367,
+        23.197786,
+        10.664817
+      ],
+      "op_peak_times_ms": [
+        20.507812,
+        32.714844,
+        42.480469,
+        54.199219
+      ],
+      "sum_op_amplitude_uv": 66.064566,
+      "max_op_amplitude_uv": 23.197786,
+      "dominant_freq_hz": 100.000051,
+      "fft_band_amp_uv": 2.020155,
+      "op_count": 4
+    }
+  },
+  "Dark-Adapted_3_OSCILLATORY_POTENTIAL_ERG_RIGHT - OD.csv": {
+    "eye": "RIGHT - OD",
+    "protocol": "dark_adapted_3_ops",
+    "exam_start": "23/10/2026 11:27:00",
+    "active_channel": "AV1(uV)",
+    "n_samples": 512,
+    "markers": {
+      "a1_idx": 42,
+      "b1_idx": 74,
+      "c1_idx": 83,
+      "is_manual": false
+    },
+    "peak_metrics": {
+      "a1_uv": -7.464361,
+      "a1_ms": 20.507812,
+      "b1_uv": 6.648958,
+      "b1_ms": 36.132812,
+      "c1_uv": -6.959642,
+      "c1_ms": 40.527344,
+      "a1_b1_uv": 14.113319,
+      "a1_b1_ms": 15.625,
+      "b1_c1_uv": 13.6086,
+      "b1_c1_ms": 4.394532
+    },
+    "flicker_metrics": null,
+    "op_metrics": {
+      "op_amplitudes_uv": [
+        1.949263,
+        13.715436,
+        12.807933,
+        13.279345
+      ],
+      "op_peak_times_ms": [
+        16.113281,
+        25.878906,
+        36.132812,
+        45.898438
+      ],
+      "sum_op_amplitude_uv": 41.751977,
+      "max_op_amplitude_uv": 13.715436,
+      "dominant_freq_hz": 100.000051,
+      "fft_band_amp_uv": 6.373083,
+      "op_count": 4
+    }
   },
   "Light-Adapted_3_ERG_LEFT - OS.csv": {
     "eye": "LEFT - OS",
@@ -127,7 +221,8 @@
       "b1_c1_uv": 31.958008,
       "b1_c1_ms": 53.710937
     },
-    "flicker_metrics": null
+    "flicker_metrics": null,
+    "op_metrics": null
   },
   "Light-Adapted_3_ERG_RIGHT - OD.csv": {
     "eye": "RIGHT - OD",
@@ -153,7 +248,8 @@
       "b1_c1_uv": 14.227295,
       "b1_c1_ms": 25.390625
     },
-    "flicker_metrics": null
+    "flicker_metrics": null,
+    "op_metrics": null
   },
   "Light-Adapted_3_Flicker_ERG_LEFT - OS.csv": {
     "eye": "LEFT - OS",
@@ -187,7 +283,8 @@
       "dominant_freq_hz": 30.001183,
       "cycles_detected": 5,
       "first_peak_time_ms": 16.275391
-    }
+    },
+    "op_metrics": null
   },
   "Light-Adapted_3_Flicker_ERG_RIGHT - OD.csv": {
     "eye": "RIGHT - OD",
@@ -221,6 +318,7 @@
       "dominant_freq_hz": 24.000946,
       "cycles_detected": 3,
       "first_peak_time_ms": 29.621211
-    }
+    },
+    "op_metrics": null
   }
 }

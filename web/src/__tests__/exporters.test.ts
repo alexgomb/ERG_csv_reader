@@ -30,11 +30,12 @@ function loadLeftExamples() {
 }
 
 describe('Exporters & JSON Session Persistence (web)', () => {
-  it('exports empty and Unicode/quoted batch CSV with exact 27 columns', () => {
+  it('exports empty and Unicode/quoted batch CSV with exact 34 columns', () => {
     const emptyCsv = buildSummaryCsvText([])
     expect(emptyCsv.startsWith('\uFEFF')).toBe(true)
     const headerLine = emptyCsv.slice(1).trim().split('\r\n')[0]
     expect(headerLine.split(',')).toEqual([...EXPORT_COLUMNS])
+    expect(EXPORT_COLUMNS.length).toBe(34)
 
     const records = loadLeftExamples()
     records[0].metadata.strain_lastname = 'C57BL/6J, "WT"'
@@ -45,6 +46,7 @@ describe('Exporters & JSON Session Persistence (web)', () => {
     expect(csvText).toContain('"C57BL/6J, ""WT"""')
     expect(csvText).toContain('Ratón #1 — Español')
     expect(csvText).toContain('"Nota con ""comillas"", y coma"')
+    expect(csvText).toContain('66.06')
   })
 
   it('generates valid multi-sheet Excel (.xlsx) readable back via read-excel-file', async () => {
@@ -57,10 +59,13 @@ describe('Exporters & JSON Session Persistence (web)', () => {
 
     const buf = Buffer.from(await blob.arrayBuffer())
     const summaryRows = await readSheet(buf, 'ERG Summary')
-    expect(summaryRows.length).toBe(5) // 1 header + 4 OS traces
+    expect(summaryRows.length).toBe(6) // 1 header + 5 OS traces
     expect(summaryRows[0]).toEqual([...EXPORT_COLUMNS])
     expect(summaryRows[1][4]).toBe('C57')
     expect(summaryRows[1][5]).toBe('C57 P21')
+    const opRow = summaryRows.find((r) => String(r[0]).includes('OSCILLATORY'))!
+    expect(opRow[EXPORT_COLUMNS.indexOf('OP Sum Amplitude (uV)')]).toBe(66.06)
+    expect(opRow[EXPORT_COLUMNS.indexOf('OP Wavelets')]).toBe(4)
 
     const infoRows = await readSheet(buf, 'Export Info')
     const flatInfo = infoRows.flat().map(String)
@@ -74,18 +79,25 @@ describe('Exporters & JSON Session Persistence (web)', () => {
     expect(emptyRows.length).toBe(1)
   })
 
-  it('formats Retimax clipboard TSV with optional Flicker metrics section', () => {
+  it('formats Retimax clipboard TSV with optional Flicker and Oscillatory Potentials sections', () => {
     const records = loadLeftExamples()
-    const da3 = records.find((r) => r.file_name.includes('Dark-Adapted_3'))!
+    const da3 = records.find((r) => r.file_name.includes('Dark-Adapted_3_ERG'))!
     const flk = records.find((r) => r.file_name.includes('Flicker'))!
+    const ops = records.find((r) => r.file_name.includes('OSCILLATORY'))!
 
     const tsvDa3 = formatRecordClipboardTsv(da3)
     expect(tsvDa3).toContain('LEFT - OS\tA1\tB1\tC1\tA1-B1\tB1-C1')
     expect(tsvDa3).not.toContain('30 Hz Flicker')
+    expect(tsvDa3).not.toContain('Oscillatory Potentials')
 
     const tsvFlk = formatRecordClipboardTsv(flk)
     expect(tsvFlk).toContain('30 Hz Flicker')
     expect(tsvFlk).toContain('30.00')
+
+    const tsvOps = formatRecordClipboardTsv(ops)
+    expect(tsvOps).toContain('Oscillatory Potentials')
+    expect(tsvOps).toContain('DA 3.0 OPs')
+    expect(tsvOps).toContain('66.06')
   })
 
   it('round-trips JSON session preserving manual markers, manual protocol, overlays, and edge cases', () => {
@@ -102,7 +114,7 @@ describe('Exporters & JSON Session Persistence (web)', () => {
     const loaded = parseSessionJson(json)
 
     expect(loaded.warnings).toEqual([])
-    expect(loaded.records.length).toBe(4)
+    expect(loaded.records.length).toBe(5)
     expect(loaded.activeRecordId).toBe(target.record_id)
     expect(loaded.config.include_right_od).toBe(true)
 

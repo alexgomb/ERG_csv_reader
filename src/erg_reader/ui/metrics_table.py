@@ -15,14 +15,18 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
 )
 
-from erg_reader.analysis import compute_flicker_metrics, compute_peak_metrics
+from erg_reader.analysis import (
+    compute_flicker_metrics,
+    compute_op_metrics,
+    compute_peak_metrics,
+)
 from erg_reader.i18n import Translator
 from erg_reader.models import ERGProtocol, ERGSessionRecord, EyeSide
 from erg_reader.themes import get_plot_palette
 
 
 class MetricsTablePanel(QFrame):
-    """Displays Retimax-format A1/B1/C1/A1-B1/B1-C1 table and optional Flicker metrics."""
+    """Displays Retimax-format A1/B1/C1/A1-B1/B1-C1 table plus optional Flicker / OP metrics."""
 
     def __init__(self, translator: Translator, theme: str = "light", parent=None) -> None:
         super().__init__(parent)
@@ -113,6 +117,46 @@ class MetricsTablePanel(QFrame):
         self.flicker_card.setVisible(False)
         layout.addWidget(self.flicker_card)
 
+        # Dedicated Oscillatory Potentials (OP1-OP4) bar (visible only for OP recordings)
+        self.op_card = QFrame()
+        self.op_card.setObjectName("OPCard")
+        op_layout = QVBoxLayout(self.op_card)
+        op_layout.setContentsMargins(10, 6, 10, 8)
+        op_layout.setSpacing(4)
+
+        self.op_title = QLabel("")
+        self.op_title.setFont(title_font)
+        op_layout.addWidget(self.op_title)
+
+        op_grid = QGridLayout()
+        op_grid.setHorizontalSpacing(12)
+        op_grid.setVerticalSpacing(2)
+
+        self._op_label_widgets: dict[str, QLabel] = {}
+        self._op_value_widgets: dict[str, QLabel] = {}
+        op_keys = (
+            "op_sum",
+            "op_1",
+            "op_2",
+            "op_3",
+            "op_4",
+            "op_dom_freq",
+            "op_count",
+        )
+        for idx, key in enumerate(op_keys):
+            lbl = QLabel("")
+            lbl.setObjectName("MutedLabel")
+            val = QLabel("—")
+            val.setFont(val_font)
+            op_grid.addWidget(lbl, 0, idx)
+            op_grid.addWidget(val, 1, idx)
+            self._op_label_widgets[key] = lbl
+            self._op_value_widgets[key] = val
+
+        op_layout.addLayout(op_grid)
+        self.op_card.setVisible(False)
+        layout.addWidget(self.op_card)
+
     def apply_theme(self, theme: str) -> None:
         self._theme = theme
         self._style_cells()
@@ -131,6 +175,10 @@ class MetricsTablePanel(QFrame):
         for key, lbl in self._flicker_label_widgets.items():
             lbl.setText(self._tr.tr(key))
 
+        self.op_title.setText(self._tr.tr("op_panel_title"))
+        for key, lbl in self._op_label_widgets.items():
+            lbl.setText(self._tr.tr(key))
+
     def set_record(self, record: ERGSessionRecord | None) -> None:
         self._record = record
         self.retranslate_ui()
@@ -139,6 +187,7 @@ class MetricsTablePanel(QFrame):
                 for col in range(1, 6):
                     self.table.item(row, col).setText("—")
             self.flicker_card.setVisible(False)
+            self.op_card.setVisible(False)
             self._style_cells()
             return
 
@@ -160,8 +209,24 @@ class MetricsTablePanel(QFrame):
             self._flicker_value_widgets["flicker_dom_freq"].setText(f"{fl.dominant_freq_hz:.2f} Hz")
             self._flicker_value_widgets["flicker_cycles"].setText(str(fl.cycles_detected))
             self.flicker_card.setVisible(True)
+            self.op_card.setVisible(False)
+        elif record.protocol == ERGProtocol.DARK_ADAPTED_3_OPS:
+            ops = compute_op_metrics(record.time_ms, record.active_signal)
+            self._op_value_widgets["op_sum"].setText(f"{ops.sum_op_amplitude_uv:.2f} µV")
+            for idx, key in enumerate(("op_1", "op_2", "op_3", "op_4")):
+                if idx < len(ops.op_amplitudes_uv):
+                    self._op_value_widgets[key].setText(
+                        f"{ops.op_amplitudes_uv[idx]:.2f} µV ({ops.op_peak_times_ms[idx]:.1f} ms)"
+                    )
+                else:
+                    self._op_value_widgets[key].setText("—")
+            self._op_value_widgets["op_dom_freq"].setText(f"{ops.dominant_freq_hz:.1f} Hz")
+            self._op_value_widgets["op_count"].setText(str(ops.op_count))
+            self.flicker_card.setVisible(False)
+            self.op_card.setVisible(True)
         else:
             self.flicker_card.setVisible(False)
+            self.op_card.setVisible(False)
 
         self._style_cells()
 

@@ -39,11 +39,27 @@ def test_parse_flicker_duration_and_protocol() -> None:
     assert 165.0 < rec.duration_ms < 168.0
 
 
+def test_parse_oscillatory_potentials_protocol(tmp_path: Path) -> None:
+    csv_path = EXAMPLE_DIR / "Dark-Adapted_3_OSCILLATORY_POTENTIAL_ERG_LEFT - OS.csv"
+    rec = parse_retimax_csv(csv_path)
+
+    assert rec.eye == EyeSide.LEFT_OS
+    assert rec.protocol == ERGProtocol.DARK_ADAPTED_3_OPS
+    assert rec.metadata.exam_start == "23/10/2026 11:27:00"
+    assert len(rec.time_ms) == 512
+    assert np.isclose(rec.time_ms[-1], 249.511719, atol=1e-4)
+
+    # Spanish and shorthand OP filenames should also resolve to DARK_ADAPTED_3_OPS
+    renamed = tmp_path / "Potenciales_Oscilatorios_P21_OS.csv"
+    renamed.write_bytes(csv_path.read_bytes())
+    assert parse_retimax_csv(renamed).protocol == ERGProtocol.DARK_ADAPTED_3_OPS
+
+
 def test_batch_load_skips_right_od_by_default() -> None:
     result = load_csv_batch([EXAMPLE_DIR])
 
-    assert len(result.records) == 4
-    assert len(result.skipped_right_od) == 4
+    assert len(result.records) == 5
+    assert len(result.skipped_right_od) == 5
     assert len(result.errors) == 0
     assert all(r.eye == EyeSide.LEFT_OS for r in result.records)
 
@@ -52,10 +68,10 @@ def test_batch_load_includes_right_od_when_enabled() -> None:
     cfg = DetectionConfig(include_right_od=True)
     result = load_csv_batch([EXAMPLE_DIR], config=cfg)
 
-    assert len(result.records) == 8
+    assert len(result.records) == 10
     assert len(result.skipped_right_od) == 0
-    assert sum(1 for r in result.records if r.eye == EyeSide.LEFT_OS) == 4
-    assert sum(1 for r in result.records if r.eye == EyeSide.RIGHT_OD) == 4
+    assert sum(1 for r in result.records if r.eye == EyeSide.LEFT_OS) == 5
+    assert sum(1 for r in result.records if r.eye == EyeSide.RIGHT_OD) == 5
 
 
 def test_recursive_folder_discovery_and_mouse_metadata_inference(tmp_path: Path) -> None:

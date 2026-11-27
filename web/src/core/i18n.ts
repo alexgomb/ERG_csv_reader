@@ -42,7 +42,8 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     plot_drag_hint:
       'Drag A1, B1, or C1 along the trace to adjust · Scroll to zoom · Drag canvas to pan',
     plot_empty_title: 'Drop CSO Retimax CSV files or folders anywhere',
-    plot_empty_subtitle: 'Or load the bundled murine ERG example recordings to test immediately.',
+    plot_empty_subtitle:
+      'Or load the bundled C57BL/6 (P21) murine ERG example recordings to test immediately.',
     plot_reference_tag: 'REF',
     // Metrics table
     table_amplitude: 'Amplitude (µV)',
@@ -54,6 +55,14 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     flicker_fft_pp: 'FFT Peak-to-Peak',
     flicker_dom_freq: 'Dominant Freq',
     flicker_cycles: 'Cycles',
+    op_panel_title: 'Oscillatory Potentials Analysis (OP1–OP4 · Raw Signal)',
+    op_sum: 'Sum OPs (∑OP)',
+    op_1: 'OP1',
+    op_2: 'OP2',
+    op_3: 'OP3',
+    op_4: 'OP4',
+    op_dom_freq: 'Dominant Freq',
+    op_count: 'Wavelets',
     // Right controls
     ctrl_files_group: 'Files & Sessions',
     btn_open_csv: 'Open CSV Files',
@@ -88,6 +97,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     // Protocols
     protocol_dark_adapted_3: 'Dark-Adapted 3.0',
     protocol_dark_adapted_10: 'Dark-Adapted 10.0',
+    protocol_dark_adapted_3_ops: 'Oscillatory Potentials (OPs)',
     protocol_light_adapted_3: 'Light-Adapted 3.0',
     protocol_light_adapted_3_flicker: 'Flicker 30 Hz',
     protocol_unknown: 'Custom / Other',
@@ -105,7 +115,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     // About Dialog
     about_title: 'About nBio ERG-Trace',
     about_description:
-      'Browser & desktop electroretinography (ERG) viewer and amplitude analyzer designed for murine recordings exported as CSV from the CSO Retimax system. All CSV processing runs 100% locally on your device.',
+      'Browser & desktop electroretinography (ERG) viewer and amplitude analyzer designed for murine recordings exported as CSV from the CSO Retimax system (including Oscillatory Potentials OP1–OP4 and 30 Hz Flicker FFT). Bundled examples: C57BL/6 mouse at postnatal day 21 (P21). All CSV processing runs 100% locally on your device.',
     about_author_label: 'Author:',
     about_group_label: 'Research Group:',
     about_group_value: 'Grupo nBio · Instituto de Bioingeniería · Universidad Miguel Hernández',
@@ -115,7 +125,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     about_repo_label: 'Repository & Windows .exe:',
     about_close: 'Close',
     // Status messages
-    status_ready: 'Ready — Drop CSO Retimax CSV files or click Examples to start.',
+    status_ready: 'Ready — Drop CSO Retimax CSV files or click Examples (C57BL/6 P21) to start.',
     status_loaded: 'Loaded {loaded} trace(s) ({skipped} RIGHT - OD skipped).',
     status_loaded_no_skip: 'Loaded {loaded} trace(s).',
     status_all_skipped_od:
@@ -166,7 +176,8 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     plot_drag_hint:
       'Arrastra A1, B1 o C1 sobre la curva para ajustar · Rueda para zoom · Arrastra el fondo para desplazar',
     plot_empty_title: 'Arrastra archivos CSV o carpetas de CSO Retimax aquí',
-    plot_empty_subtitle: 'O carga los registros murinos de ejemplo incluidos para probar al instante.',
+    plot_empty_subtitle:
+      'O carga los registros murinos de ejemplo incluidos (C57BL/6, 21 días post natal · P21) para probar al instante.',
     plot_reference_tag: 'REF',
     // Metrics table
     table_amplitude: 'Amplitud (µV)',
@@ -178,6 +189,14 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     flicker_fft_pp: 'FFT Pico-Pico',
     flicker_dom_freq: 'Frec. dominante',
     flicker_cycles: 'Ciclos',
+    op_panel_title: 'Análisis Potenciales Oscilatorios (OP1–OP4 · Señal cruda)',
+    op_sum: 'Suma OPs (∑OP)',
+    op_1: 'OP1',
+    op_2: 'OP2',
+    op_3: 'OP3',
+    op_4: 'OP4',
+    op_dom_freq: 'Frec. dominante',
+    op_count: 'Ondículas',
     // Right controls
     ctrl_files_group: 'Archivos y sesiones',
     btn_open_csv: 'Abrir archivos CSV',
@@ -212,6 +231,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     // Protocols
     protocol_dark_adapted_3: 'Dark-Adapted 3.0',
     protocol_dark_adapted_10: 'Dark-Adapted 10.0',
+    protocol_dark_adapted_3_ops: 'Potenciales Oscilatorios (OPs)',
     protocol_light_adapted_3: 'Light-Adapted 3.0',
     protocol_light_adapted_3_flicker: 'Flicker 30 Hz',
     protocol_unknown: 'Personalizado',
@@ -230,7 +250,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     // About Dialog
     about_title: 'Acerca de nBio ERG-Trace',
     about_description:
-      'Visor y analizador web y de escritorio para registros de electrorretinografía (ERG) murina exportados en CSV desde el sistema CSO Retimax. Todo el análisis se ejecuta 100% en local en tu navegador.',
+      'Visor y analizador web y de escritorio para registros de electrorretinografía (ERG) murina exportados en CSV desde el sistema CSO Retimax (incluyendo Potenciales Oscilatorios OP1–OP4 y Flicker 30 Hz FFT). Ejemplos incluidos: ratón C57BL/6 a 21 días post natal (P21). Todo el análisis se ejecuta 100% en local en tu navegador.',
     about_author_label: 'Autor:',
     about_group_label: 'Grupo / Institución:',
     about_group_value: 'Grupo nBio · Instituto de Bioingeniería · Universidad Miguel Hernández',
@@ -240,7 +260,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     about_repo_label: 'Repositorio y .exe Windows:',
     about_close: 'Cerrar',
     // Status messages
-    status_ready: 'Listo — Arrastra archivos CSV de CSO Retimax o pulsa Ejemplos para empezar.',
+    status_ready: 'Listo — Arrastra archivos CSV de CSO Retimax o pulsa Ejemplos (C57BL/6 P21) para empezar.',
     status_loaded: 'Cargadas {loaded} curva(s) ({skipped} de RIGHT - OD omitidas).',
     status_loaded_no_skip: 'Cargadas {loaded} curva(s).',
     status_all_skipped_od:

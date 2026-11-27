@@ -13,7 +13,11 @@ from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
 from erg_reader import APP_NAME, __author__, __version__
-from erg_reader.analysis import compute_flicker_metrics, compute_peak_metrics
+from erg_reader.analysis import (
+    compute_flicker_metrics,
+    compute_op_metrics,
+    compute_peak_metrics,
+)
 from erg_reader.models import (
     DetectionConfig,
     ERGProtocol,
@@ -52,8 +56,19 @@ EXPORT_COLUMNS = [
     "Flicker FFT P-P (uV)",
     "Flicker Freq (Hz)",
     "Flicker Cycles",
+    "OP Sum Amplitude (uV)",
+    "OP1 Amplitude (uV)",
+    "OP2 Amplitude (uV)",
+    "OP3 Amplitude (uV)",
+    "OP4 Amplitude (uV)",
+    "OP Dominant Freq (Hz)",
+    "OP Wavelets",
     "Notes",
 ]
+
+
+def _op_amp_at(amps: tuple[float, ...], idx: int) -> float | str:
+    return round(amps[idx], 2) if idx < len(amps) else ""
 
 
 def build_summary_rows(records: Sequence[ERGSessionRecord]) -> list[dict[str, Any]]:
@@ -64,6 +79,11 @@ def build_summary_rows(records: Sequence[ERGSessionRecord]) -> list[dict[str, An
         flicker = (
             compute_flicker_metrics(rec.time_ms, rec.active_signal)
             if rec.protocol == ERGProtocol.LIGHT_ADAPTED_3_FLICKER
+            else None
+        )
+        ops = (
+            compute_op_metrics(rec.time_ms, rec.active_signal)
+            if rec.protocol == ERGProtocol.DARK_ADAPTED_3_OPS
             else None
         )
         rows.append(
@@ -94,6 +114,13 @@ def build_summary_rows(records: Sequence[ERGSessionRecord]) -> list[dict[str, An
                 "Flicker FFT P-P (uV)": round(flicker.fft_peak_to_peak_uv, 2) if flicker else "",
                 "Flicker Freq (Hz)": round(flicker.dominant_freq_hz, 2) if flicker else "",
                 "Flicker Cycles": flicker.cycles_detected if flicker else "",
+                "OP Sum Amplitude (uV)": round(ops.sum_op_amplitude_uv, 2) if ops else "",
+                "OP1 Amplitude (uV)": _op_amp_at(ops.op_amplitudes_uv, 0) if ops else "",
+                "OP2 Amplitude (uV)": _op_amp_at(ops.op_amplitudes_uv, 1) if ops else "",
+                "OP3 Amplitude (uV)": _op_amp_at(ops.op_amplitudes_uv, 2) if ops else "",
+                "OP4 Amplitude (uV)": _op_amp_at(ops.op_amplitudes_uv, 3) if ops else "",
+                "OP Dominant Freq (Hz)": round(ops.dominant_freq_hz, 2) if ops else "",
+                "OP Wavelets": ops.op_count if ops else "",
                 "Notes": rec.metadata.notes,
             }
         )
@@ -207,6 +234,16 @@ def format_record_clipboard_tsv(record: ERGSessionRecord) -> str:
             f"30 Hz Flicker\t{fl.mean_peak_to_trough_uv:.2f}\t{fl.std_peak_to_trough_uv:.2f}\t"
             f"{fl.fft_fundamental_amp_uv:.2f}\t{fl.fft_peak_to_peak_uv:.2f}\t"
             f"{fl.dominant_freq_hz:.2f}\t{fl.cycles_detected}"
+        )
+    elif record.protocol == ERGProtocol.DARK_ADAPTED_3_OPS:
+        ops = compute_op_metrics(record.time_ms, record.active_signal)
+        op_vals = [f"{ops.op_amplitudes_uv[i]:.2f}" if i < len(ops.op_amplitudes_uv) else "—" for i in range(4)]
+        lines.append("")
+        lines.append("Oscillatory Potentials\tSum OPs (uV)\tOP1 (uV)\tOP2 (uV)\tOP3 (uV)\tOP4 (uV)\tFreq (Hz)\tWavelets")
+        lines.append(
+            f"DA 3.0 OPs\t{ops.sum_op_amplitude_uv:.2f}\t"
+            + "\t".join(op_vals)
+            + f"\t{ops.dominant_freq_hz:.2f}\t{ops.op_count}"
         )
     return "\n".join(lines)
 

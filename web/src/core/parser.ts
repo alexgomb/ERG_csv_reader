@@ -114,6 +114,14 @@ export function inferProtocol(fileName: string, timeMs: readonly number[]): ERGP
       return 'light_adapted_3_flicker'
     }
   }
+  if (
+    low.includes('oscillatory') ||
+    low.includes('oscilatorio') ||
+    low.includes('osc_pot') ||
+    /(?:^|[^a-z0-9])ops?(?:[^a-z0-9]|$)/.test(low)
+  ) {
+    return 'dark_adapted_3_ops'
+  }
   if (low.includes('light') || low.includes('photopic') || /\bla[\s_-]?3/.test(low)) {
     return 'light_adapted_3'
   }

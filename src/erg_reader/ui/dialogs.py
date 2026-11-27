@@ -30,6 +30,7 @@ from erg_reader.ui.branding import create_erg_pixmap, render_umh_nbio_pixmap
 PROTOCOL_ORDER = (
     ERGProtocol.DARK_ADAPTED_3,
     ERGProtocol.DARK_ADAPTED_10,
+    ERGProtocol.DARK_ADAPTED_3_OPS,
     ERGProtocol.LIGHT_ADAPTED_3,
     ERGProtocol.LIGHT_ADAPTED_3_FLICKER,
     ERGProtocol.UNKNOWN,

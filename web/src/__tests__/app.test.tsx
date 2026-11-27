@@ -48,7 +48,7 @@ describe('nBio ERG-Trace Web UI Integration', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('status-bar')).toHaveTextContent(
-        'Loaded 4 trace(s) (4 RIGHT - OD skipped).',
+        'Loaded 5 trace(s) (5 RIGHT - OD skipped).',
       )
     })
 
@@ -61,13 +61,13 @@ describe('nBio ERG-Trace Web UI Integration', () => {
 
     expect(document.documentElement.getAttribute('data-theme')).toBe('dark')
     expect(screen.getByTestId('status-bar')).toHaveTextContent(
-      'Cargadas 4 curva(s) (4 de RIGHT - OD omitidas).',
+      'Cargadas 5 curva(s) (5 de RIGHT - OD omitidas).',
     )
     const bannerImg = screen.getByAltText(/Grupo nBio/i) as HTMLImageElement
     expect(bannerImg.src).toContain('umh_nbio_dark.svg')
   })
 
-  it('supports manual sidebar protocol switching to toggle 30 Hz Flicker analysis bar', async () => {
+  it('supports manual sidebar protocol switching to toggle 30 Hz Flicker and Oscillatory Potentials bars', async () => {
     const user = userEvent.setup()
     render(<App />)
 
@@ -76,20 +76,31 @@ describe('nBio ERG-Trace Web UI Integration', () => {
       expect(screen.getByTestId('metric-a1b1-uv')).toHaveTextContent('366.53')
     })
 
-    // Initially DA 10 -> no Flicker analysis bar
+    // Initially DA 10 -> neither Flicker nor OP analysis bar
     expect(screen.queryByTestId('flicker-analysis-bar')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('op-analysis-bar')).not.toBeInTheDocument()
 
     // Manually switch protocol dropdown to Flicker 30 Hz
     const protoSelect = document.getElementById('meta-protocol') as HTMLSelectElement
     await user.selectOptions(protoSelect, 'light_adapted_3_flicker')
     expect(screen.getByTestId('flicker-analysis-bar')).toBeInTheDocument()
+    expect(screen.queryByTestId('op-analysis-bar')).not.toBeInTheDocument()
     expect(document.getElementById('plot-protocol-badge')).toHaveTextContent(
       'LIGHT-ADAPTED 3.0 FLICKER ERG',
     )
 
-    // Switch back to Dark-Adapted 10 -> Flicker bar hides
+    // Manually switch protocol dropdown to Oscillatory Potentials -> OP bar shows, Flicker hides
+    await user.selectOptions(protoSelect, 'dark_adapted_3_ops')
+    expect(screen.getByTestId('op-analysis-bar')).toBeInTheDocument()
+    expect(screen.queryByTestId('flicker-analysis-bar')).not.toBeInTheDocument()
+    expect(document.getElementById('plot-protocol-badge')).toHaveTextContent(
+      'DARK-ADAPTED 3.0 OSCILLATORY POTENTIALS',
+    )
+
+    // Switch back to Dark-Adapted 10 -> both specialized bars hide
     await user.selectOptions(protoSelect, 'dark_adapted_10')
     expect(screen.queryByTestId('flicker-analysis-bar')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('op-analysis-bar')).not.toBeInTheDocument()
   })
 
   it('opens About modal with Grupo nBio · Instituto de Bioingeniería · Universidad Miguel Hernández and Settings modal', async () => {
@@ -102,17 +113,18 @@ describe('nBio ERG-Trace Web UI Integration', () => {
       'Grupo nBio · Instituto de Bioingeniería · Universidad Miguel Hernández',
     )
     expect(screen.getByRole('dialog')).toHaveTextContent('Alejandro Gombau García')
+    expect(screen.getByRole('dialog')).toHaveTextContent('C57BL/6')
     await user.click(document.getElementById('about-close-btn')!)
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
 
-    // Open Settings modal, enable RIGHT - OD, apply, and reload examples -> 8 traces loaded
+    // Open Settings modal, enable RIGHT - OD, apply, and reload examples -> 10 traces loaded
     await user.click(document.getElementById('ctrl-settings-btn')!)
     await user.click(document.getElementById('settings-include-od')!)
     await user.click(document.getElementById('settings-apply-btn')!)
 
     await user.click(document.getElementById('ctrl-load-examples-btn')!)
     await waitFor(() => {
-      expect(screen.getByTestId('status-bar')).toHaveTextContent('Loaded 8 trace(s).')
+      expect(screen.getByTestId('status-bar')).toHaveTextContent('Loaded 10 trace(s).')
     })
   })
 
@@ -122,7 +134,7 @@ describe('nBio ERG-Trace Web UI Integration', () => {
 
     await user.click(document.getElementById('ctrl-load-examples-btn')!)
     await waitFor(() => {
-      expect(screen.getAllByRole('checkbox', { name: /Overlay /i }).length).toBe(4)
+      expect(screen.getAllByRole('checkbox', { name: /Overlay /i }).length).toBe(5)
     })
 
     // Edit Mouse ID

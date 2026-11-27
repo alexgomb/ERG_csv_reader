@@ -701,6 +701,26 @@ body {
   color: var(--text-primary);
 }
 
+.op-bar {
+  border-left: 3px solid var(--accent-primary);
+}
+
+.op-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.op-sum-value {
+  color: var(--accent-primary);
+}
+
+.op-subtime {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
 /* ==================== STATUS BAR ==================== */
 .status-bar {
   display: flex;

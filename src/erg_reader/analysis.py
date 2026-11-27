@@ -10,6 +10,7 @@ from erg_reader.models import (
     ERGProtocol,
     FlickerMetrics,
     MarkerIndices,
+    OPMetrics,
     PeakMetrics,
 )
 
@@ -65,12 +66,17 @@ def auto_detect_markers(
         b1_idx = a1_idx + 1
 
     # 3. C1: post-b-wave reference / trough inside C1 physiological window
-    min_gap = 6.0 if protocol == ERGProtocol.LIGHT_ADAPTED_3_FLICKER else 15.0
+    if protocol == ERGProtocol.DARK_ADAPTED_3_OPS:
+        min_gap = 4.0
+    elif protocol == ERGProtocol.LIGHT_ADAPTED_3_FLICKER:
+        min_gap = 6.0
+    else:
+        min_gap = 15.0
     c_start = max(win.c_min_ms, float(time_ms[b1_idx]) + min_gap)
     c_end = max(win.c_max_ms, c_start + 5.0)
     c_candidates = _window_indices(time_ms, c_start, c_end)
 
-    if protocol == ERGProtocol.LIGHT_ADAPTED_3_FLICKER:
+    if protocol in (ERGProtocol.LIGHT_ADAPTED_3_FLICKER, ERGProtocol.DARK_ADAPTED_3_OPS):
         # Next trough following B1 peak
         c1_idx = int(c_candidates[int(np.argmin(signal_uv[c_candidates]))])
     else:
@@ -203,6 +209,76 @@ def compute_flicker_metrics(
         dominant_freq_hz=dom_freq,
         cycles_detected=cycles,
         first_peak_time_ms=first_peak_ms,
+    )
+
+
+def compute_op_metrics(
+    time_ms: np.ndarray,
+    signal_uv: np.ndarray,
+    window_start_ms: float = 15.0,
+    window_end_ms: float = 65.0,
+    max_wavelets: int = 4,
+) -> OPMetrics:
+    """Compute non-destructive Oscillatory Potentials (OP1-OP4) trough-to-peak amplitudes and 60-200 Hz FFT.
+
+    Measured directly from the raw CSO Retimax Oscillatory Potentials trace without filtering.
+    """
+    n = len(time_ms)
+    if n < 8:
+        return OPMetrics(
+            op_amplitudes_uv=(),
+            op_peak_times_ms=(),
+            sum_op_amplitude_uv=0.0,
+            max_op_amplitude_uv=0.0,
+            dominant_freq_hz=0.0,
+            fft_band_amp_uv=0.0,
+            op_count=0,
+        )
+
+    dt_ms = float(np.median(np.diff(time_ms)))
+    fs_hz = 1000.0 / dt_ms if dt_ms > 0 else 1000.0
+
+    # Extract OP1-OP4 wavelets inside the physiological ascending-b-wave window (15-65 ms)
+    win_mask = (time_ms >= window_start_ms) & (time_ms <= window_end_ms)
+    win_indices = np.flatnonzero(win_mask)
+
+    op_amps: list[float] = []
+    op_times: list[float] = []
+
+    if len(win_indices) >= 3:
+        seg = signal_uv[win_indices]
+        min_dist = max(3, int(round(0.006 * fs_hz)))
+        prominence = max(0.35 * float(np.std(seg)), 1.5)
+        rel_peaks, _ = find_peaks(seg, distance=min_dist, prominence=prominence)
+        peaks = [int(win_indices[int(p)]) for p in rel_peaks[:max_wavelets]]
+
+        win_start_idx = int(win_indices[0])
+        for i, pk in enumerate(peaks):
+            search_start = peaks[i - 1] if i > 0 else win_start_idx
+            trough_idx = search_start + int(np.argmin(signal_uv[search_start : pk + 1]))
+            op_amps.append(float(signal_uv[pk] - signal_uv[trough_idx]))
+            op_times.append(float(time_ms[pk]))
+
+    # Single-sided FFT dominant component in the ISCEV OP frequency band (60-200 Hz)
+    centered = signal_uv - float(np.mean(signal_uv))
+    freqs = np.fft.rfftfreq(n, d=1.0 / fs_hz)
+    spectrum = (2.0 / n) * np.abs(np.fft.rfft(centered))
+
+    band_mask = (freqs >= 60.0) & (freqs <= 200.0)
+    if np.any(band_mask):
+        band_indices = np.flatnonzero(band_mask)
+        best_idx = int(band_indices[int(np.argmax(spectrum[band_indices]))])
+    else:
+        best_idx = int(np.argmax(spectrum[1:])) + 1 if len(spectrum) > 1 else 0
+
+    return OPMetrics(
+        op_amplitudes_uv=tuple(op_amps),
+        op_peak_times_ms=tuple(op_times),
+        sum_op_amplitude_uv=float(sum(op_amps)),
+        max_op_amplitude_uv=float(max(op_amps)) if op_amps else 0.0,
+        dominant_freq_hz=float(freqs[best_idx]),
+        fft_band_amp_uv=float(spectrum[best_idx]),
+        op_count=len(op_amps),
     )
 
 

@@ -19,7 +19,7 @@ def test_mainwindow_load_examples_switch_lang_and_theme(qtbot) -> None:
     assert "nBio ERG-Trace" in win.windowTitle()
 
     win.load_example_files()
-    assert len(win.records) == 4
+    assert len(win.records) == 5
     assert win.active_record is not None
 
     # Switch to Spanish and Dark Mode live
@@ -29,17 +29,26 @@ def test_mainwindow_load_examples_switch_lang_and_theme(qtbot) -> None:
     assert win.current_theme == "dark"
     assert "nBio ERG-Trace" in win.windowTitle()
     assert "Analizador" in win.windowTitle()
-    assert "Cargadas 4 curva(s)" in win.status_bar.currentMessage()
+    assert "Cargadas 5 curva(s)" in win.status_bar.currentMessage()
 
     # Select Flicker trace and confirm Flicker metrics bar becomes visible
     flicker = next(r for r in win.records if "Flicker" in r.file_name)
     win.select_record(flicker.record_id)
     assert win.metrics_panel.flicker_card.isVisibleTo(win.metrics_panel)
+    assert not win.metrics_panel.op_card.isVisibleTo(win.metrics_panel)
 
-    # Select Dark-Adapted 3 trace and confirm Flicker bar hides
-    da3 = next(r for r in win.records if "Dark-Adapted_3" in r.file_name)
+    # Select Oscillatory Potentials trace and confirm OP metrics bar becomes visible
+    ops_rec = next(r for r in win.records if "OSCILLATORY" in r.file_name)
+    win.select_record(ops_rec.record_id)
+    assert win.metrics_panel.op_card.isVisibleTo(win.metrics_panel)
+    assert not win.metrics_panel.flicker_card.isVisibleTo(win.metrics_panel)
+    assert "66.06" in win.metrics_panel._op_value_widgets["op_sum"].text()
+
+    # Select Dark-Adapted 3 trace and confirm both specialized bars hide
+    da3 = next(r for r in win.records if "Dark-Adapted_3_ERG" in r.file_name)
     win.select_record(da3.record_id)
     assert not win.metrics_panel.flicker_card.isVisibleTo(win.metrics_panel)
+    assert not win.metrics_panel.op_card.isVisibleTo(win.metrics_panel)
 
 
 def test_mainwindow_manual_marker_drag_reset_and_overlay(qtbot, tmp_path: Path) -> None:
@@ -47,7 +56,7 @@ def test_mainwindow_manual_marker_drag_reset_and_overlay(qtbot, tmp_path: Path) 
     qtbot.addWidget(win)
     win.load_example_files()
 
-    da3 = next(r for r in win.records if "Dark-Adapted_3" in r.file_name)
+    da3 = next(r for r in win.records if "Dark-Adapted_3_ERG" in r.file_name)
     da10 = next(r for r in win.records if "Dark-Adapted_10" in r.file_name)
     win.select_record(da3.record_id)
 
@@ -98,17 +107,18 @@ def test_umh_nbio_svg_branding_and_about_dialog(qtbot) -> None:
         assert "Universidad Miguel Hernández" in texts
 
 
-def test_manual_protocol_selector_toggles_flicker_panel(qtbot) -> None:
+def test_manual_protocol_selector_toggles_flicker_and_op_panels(qtbot) -> None:
     from erg_reader.models import ERGProtocol
 
     win = MainWindow(use_settings=False, initial_language="en", initial_theme="light")
     qtbot.addWidget(win)
     win.load_example_files()
 
-    da3 = next(r for r in win.records if "Dark-Adapted_3" in r.file_name)
+    da3 = next(r for r in win.records if "Dark-Adapted_3_ERG" in r.file_name)
     win.select_record(da3.record_id)
     assert da3.protocol == ERGProtocol.DARK_ADAPTED_3
     assert not win.metrics_panel.flicker_card.isVisibleTo(win.metrics_panel)
+    assert not win.metrics_panel.op_card.isVisibleTo(win.metrics_panel)
 
     # Manually switch protocol to Flicker in the left sidebar combo box
     flk_idx = win.sidebar.protocol_combo.findData(ERGProtocol.LIGHT_ADAPTED_3_FLICKER.value)
@@ -117,13 +127,24 @@ def test_manual_protocol_selector_toggles_flicker_panel(qtbot) -> None:
 
     assert da3.protocol == ERGProtocol.LIGHT_ADAPTED_3_FLICKER
     assert win.metrics_panel.flicker_card.isVisibleTo(win.metrics_panel)
+    assert not win.metrics_panel.op_card.isVisibleTo(win.metrics_panel)
     assert win.plot_panel.protocol_badge.text() == "LIGHT-ADAPTED 3.0 FLICKER ERG"
 
-    # Switch back to Dark-Adapted 3.0 and verify Flicker panel hides again
+    # Manually switch protocol to Oscillatory Potentials -> OP panel shows, Flicker hides
+    op_idx = win.sidebar.protocol_combo.findData(ERGProtocol.DARK_ADAPTED_3_OPS.value)
+    assert op_idx >= 0
+    win.sidebar.protocol_combo.setCurrentIndex(op_idx)
+    assert da3.protocol == ERGProtocol.DARK_ADAPTED_3_OPS
+    assert win.metrics_panel.op_card.isVisibleTo(win.metrics_panel)
+    assert not win.metrics_panel.flicker_card.isVisibleTo(win.metrics_panel)
+    assert win.plot_panel.protocol_badge.text() == "DARK-ADAPTED 3.0 OSCILLATORY POTENTIALS"
+
+    # Switch back to Dark-Adapted 3.0 and verify both specialized panels hide again
     da3_idx = win.sidebar.protocol_combo.findData(ERGProtocol.DARK_ADAPTED_3.value)
     win.sidebar.protocol_combo.setCurrentIndex(da3_idx)
     assert da3.protocol == ERGProtocol.DARK_ADAPTED_3
     assert not win.metrics_panel.flicker_card.isVisibleTo(win.metrics_panel)
+    assert not win.metrics_panel.op_card.isVisibleTo(win.metrics_panel)
 
 
 def test_mainwindow_edge_cases_removal_channel_scale_settings_and_clipboard(qtbot) -> None:
@@ -135,7 +156,7 @@ def test_mainwindow_edge_cases_removal_channel_scale_settings_and_clipboard(qtbo
     win = MainWindow(use_settings=False, initial_language="en", initial_theme="light")
     qtbot.addWidget(win)
     win.load_example_files()
-    assert len(win.records) == 4
+    assert len(win.records) == 5
 
     # Switch active trace channel (AV1 -> GAV) and ensure metrics stay populated
     win._on_channel_changed("GAV(uV)")

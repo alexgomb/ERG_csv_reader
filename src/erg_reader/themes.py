@@ -135,7 +135,7 @@ QMenu::separator {
     margin: 4px 8px;
 }
 
-QFrame#SidebarPanel, QFrame#ControlsPanel, QFrame#PlotCard, QFrame#TableCard, QFrame#FlickerCard {
+QFrame#SidebarPanel, QFrame#ControlsPanel, QFrame#PlotCard, QFrame#TableCard, QFrame#FlickerCard, QFrame#OPCard {
     background-color: #FFFFFF;
     border: 1px solid #CBD5E1;
     border-radius: 8px;
@@ -422,7 +422,7 @@ QMenu::separator {
     margin: 4px 8px;
 }
 
-QFrame#SidebarPanel, QFrame#ControlsPanel, QFrame#PlotCard, QFrame#TableCard, QFrame#FlickerCard {
+QFrame#SidebarPanel, QFrame#ControlsPanel, QFrame#PlotCard, QFrame#TableCard, QFrame#FlickerCard, QFrame#OPCard {
     background-color: #1E293B;
     border: 1px solid #334155;
     border-radius: 8px;

@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest'
 import {
   autoDetectMarkers,
   computeFlickerMetrics,
+  computeOpMetrics,
   computePeakMetrics,
   findPeaks1D,
   snapTimeToIndex,
@@ -31,13 +32,22 @@ interface GoldenEntry {
   markers: { a1_idx: number; b1_idx: number; c1_idx: number; is_manual: boolean }
   peak_metrics: Record<string, number>
   flicker_metrics: Record<string, number> | null
+  op_metrics: {
+    op_amplitudes_uv: number[]
+    op_peak_times_ms: number[]
+    sum_op_amplitude_uv: number
+    max_op_amplitude_uv: number
+    dominant_freq_hz: number
+    fft_band_amp_uv: number
+    op_count: number
+  } | null
 }
 
 describe('ERG Analysis & Python 1:1 Golden Parity (web)', () => {
-  it('matches Python golden_metrics.json 1:1 across ALL 8 real CSO Retimax CSV files', () => {
+  it('matches Python golden_metrics.json 1:1 across ALL 10 real CSO Retimax CSV files (C57BL/6 P21)', () => {
     const golden = JSON.parse(fs.readFileSync(GOLDEN_PATH, 'utf-8')) as Record<string, GoldenEntry>
     const fileNames = Object.keys(golden)
-    expect(fileNames.length).toBe(8)
+    expect(fileNames.length).toBe(10)
 
     for (const fileName of fileNames) {
       const expected = golden[fileName]
@@ -83,6 +93,20 @@ describe('ERG Analysis & Python 1:1 Golden Parity (web)', () => {
           4,
         )
         expect(fl.first_peak_time_ms).toBeCloseTo(expected.flicker_metrics.first_peak_time_ms, 4)
+      }
+
+      if (expected.op_metrics) {
+        const ops = computeOpMetrics(rec.time_ms, getActiveSignal(rec))
+        expect(ops.op_count).toBe(expected.op_metrics.op_count)
+        expect(ops.sum_op_amplitude_uv).toBeCloseTo(expected.op_metrics.sum_op_amplitude_uv, 4)
+        expect(ops.max_op_amplitude_uv).toBeCloseTo(expected.op_metrics.max_op_amplitude_uv, 4)
+        expect(ops.dominant_freq_hz).toBeCloseTo(expected.op_metrics.dominant_freq_hz, 4)
+        expect(ops.fft_band_amp_uv).toBeCloseTo(expected.op_metrics.fft_band_amp_uv, 4)
+        expect(ops.op_amplitudes_uv.length).toBe(expected.op_metrics.op_amplitudes_uv.length)
+        ops.op_amplitudes_uv.forEach((amp, i) => {
+          expect(amp).toBeCloseTo(expected.op_metrics!.op_amplitudes_uv[i], 4)
+          expect(ops.op_peak_times_ms[i]).toBeCloseTo(expected.op_metrics!.op_peak_times_ms[i], 4)
+        })
       }
     }
   })
@@ -189,4 +213,27 @@ describe('ERG Analysis & Python 1:1 Golden Parity (web)', () => {
     expect(findPeaks1D([0, 1, 5, 5, 5, 1, 0])).toEqual([3])
     expect(findPeaks1D([1, 2])).toEqual([])
   })
+
+  it('handles Oscillatory Potentials edge cases: <8 samples, flat signal, dt=0, and synthetic 100 Hz burst', () => {
+    const short = computeOpMetrics([0, 1, 2], [0, 5, 0])
+    expect(short.op_count).toBe(0)
+    expect(short.sum_op_amplitude_uv).toBe(0)
+
+    const n = 512
+    const tMs = Array.from({ length: n }, (_, i) => (i * 250.0) / n)
+    const flat = computeOpMetrics(tMs, new Array<number>(n).fill(3.0))
+    expect(flat.op_count).toBe(0)
+    expect(flat.sum_op_amplitude_uv).toBe(0)
+
+    const zeroDt = computeOpMetrics(new Array<number>(64).fill(0), new Array<number>(64).fill(0))
+    expect(zeroDt.op_count).toBe(0)
+
+    const synY = tMs.map((t) => 10.0 * Math.sin(2 * Math.PI * 100.0 * (t / 1000.0)))
+    const syn = computeOpMetrics(tMs, synY)
+    expect(syn.op_count).toBe(4)
+    expect(syn.dominant_freq_hz).toBeCloseTo(100.0, 0)
+    expect(syn.sum_op_amplitude_uv).toBeGreaterThan(75.0)
+    expect(syn.sum_op_amplitude_uv).toBeLessThan(85.0)
+  })
 })
+

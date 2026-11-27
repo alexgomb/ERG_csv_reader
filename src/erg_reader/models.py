@@ -22,6 +22,7 @@ class ERGProtocol(str, Enum):
 
     DARK_ADAPTED_3 = "dark_adapted_3"
     DARK_ADAPTED_10 = "dark_adapted_10"
+    DARK_ADAPTED_3_OPS = "dark_adapted_3_ops"
     LIGHT_ADAPTED_3 = "light_adapted_3"
     LIGHT_ADAPTED_3_FLICKER = "light_adapted_3_flicker"
     UNKNOWN = "unknown"
@@ -32,6 +33,7 @@ class ERGProtocol(str, Enum):
         mapping = {
             ERGProtocol.DARK_ADAPTED_3: "DARK-ADAPTED 3.0 ERG",
             ERGProtocol.DARK_ADAPTED_10: "DARK-ADAPTED 10.0 ERG",
+            ERGProtocol.DARK_ADAPTED_3_OPS: "DARK-ADAPTED 3.0 OSCILLATORY POTENTIALS",
             ERGProtocol.LIGHT_ADAPTED_3: "LIGHT-ADAPTED 3.0 ERG",
             ERGProtocol.LIGHT_ADAPTED_3_FLICKER: "LIGHT-ADAPTED 3.0 FLICKER ERG",
             ERGProtocol.UNKNOWN: "CUSTOM ERG",
@@ -44,6 +46,7 @@ class ERGProtocol(str, Enum):
         mapping = {
             ERGProtocol.DARK_ADAPTED_3: "DA 3.0",
             ERGProtocol.DARK_ADAPTED_10: "DA 10.0",
+            ERGProtocol.DARK_ADAPTED_3_OPS: "OPs",
             ERGProtocol.LIGHT_ADAPTED_3: "LA 3.0",
             ERGProtocol.LIGHT_ADAPTED_3_FLICKER: "Flicker",
             ERGProtocol.UNKNOWN: "ERG",
@@ -102,6 +105,14 @@ def default_detection_windows() -> dict[ERGProtocol, DetectionWindow]:
             b_max_ms=100.0,
             c_min_ms=95.0,
             c_max_ms=190.0,
+        ),
+        ERGProtocol.DARK_ADAPTED_3_OPS: DetectionWindow(
+            a_min_ms=14.0,
+            a_max_ms=32.0,
+            b_min_ms=28.0,
+            b_max_ms=48.0,
+            c_min_ms=36.0,
+            c_max_ms=60.0,
         ),
         ERGProtocol.LIGHT_ADAPTED_3: DetectionWindow(
             a_min_ms=8.0,
@@ -252,6 +263,19 @@ class FlickerMetrics:
     dominant_freq_hz: float
     cycles_detected: int
     first_peak_time_ms: float
+
+
+@dataclass(frozen=True)
+class OPMetrics:
+    """Dedicated Oscillatory Potentials (OP1-OP4) metrics computed directly on raw Retimax OP trace."""
+
+    op_amplitudes_uv: tuple[float, ...]
+    op_peak_times_ms: tuple[float, ...]
+    sum_op_amplitude_uv: float
+    max_op_amplitude_uv: float
+    dominant_freq_hz: float
+    fft_band_amp_uv: float
+    op_count: int
 
 
 @dataclass

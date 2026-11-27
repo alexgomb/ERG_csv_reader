@@ -5,7 +5,7 @@
 
 import writeXlsxFile, { type Row, type SheetData } from 'write-excel-file/browser'
 
-import { computeFlickerMetrics, computePeakMetrics } from './analysis'
+import { computeFlickerMetrics, computeOpMetrics, computePeakMetrics } from './analysis'
 import {
   APP_AUTHOR,
   APP_NAME,
@@ -52,6 +52,13 @@ export const EXPORT_COLUMNS = [
   'Flicker FFT P-P (uV)',
   'Flicker Freq (Hz)',
   'Flicker Cycles',
+  'OP Sum Amplitude (uV)',
+  'OP1 Amplitude (uV)',
+  'OP2 Amplitude (uV)',
+  'OP3 Amplitude (uV)',
+  'OP4 Amplitude (uV)',
+  'OP Dominant Freq (Hz)',
+  'OP Wavelets',
   'Notes',
 ] as const
 
@@ -62,6 +69,10 @@ function round2(v: number): number {
   return Math.round(v * 100) / 100
 }
 
+function opAmpAt(amps: readonly number[], idx: number): number | '' {
+  return idx < amps.length ? round2(amps[idx]) : ''
+}
+
 export function buildSummaryRows(records: readonly ERGSessionRecord[]): SummaryRow[] {
   return records.map((rec) => {
     const signal = getActiveSignal(rec)
@@ -70,6 +81,8 @@ export function buildSummaryRows(records: readonly ERGSessionRecord[]): SummaryR
       rec.protocol === 'light_adapted_3_flicker'
         ? computeFlickerMetrics(rec.time_ms, signal)
         : null
+    const ops =
+      rec.protocol === 'dark_adapted_3_ops' ? computeOpMetrics(rec.time_ms, signal) : null
 
     return {
       'File Name': rec.file_name,
@@ -98,6 +111,13 @@ export function buildSummaryRows(records: readonly ERGSessionRecord[]): SummaryR
       'Flicker FFT P-P (uV)': fl ? round2(fl.fft_peak_to_peak_uv) : '',
       'Flicker Freq (Hz)': fl ? round2(fl.dominant_freq_hz) : '',
       'Flicker Cycles': fl ? fl.cycles_detected : '',
+      'OP Sum Amplitude (uV)': ops ? round2(ops.sum_op_amplitude_uv) : '',
+      'OP1 Amplitude (uV)': ops ? opAmpAt(ops.op_amplitudes_uv, 0) : '',
+      'OP2 Amplitude (uV)': ops ? opAmpAt(ops.op_amplitudes_uv, 1) : '',
+      'OP3 Amplitude (uV)': ops ? opAmpAt(ops.op_amplitudes_uv, 2) : '',
+      'OP4 Amplitude (uV)': ops ? opAmpAt(ops.op_amplitudes_uv, 3) : '',
+      'OP Dominant Freq (Hz)': ops ? round2(ops.dominant_freq_hz) : '',
+      'OP Wavelets': ops ? ops.op_count : '',
       Notes: rec.metadata.notes,
     }
   })
@@ -143,11 +163,11 @@ export async function buildSummaryXlsxBlob(records: readonly ERGSessionRecord[])
       const val = rowData[col]
       const isHighlight = colIdx === a1b1Index
       const isNum = typeof val === 'number'
-      const isCycles = col === 'Flicker Cycles' && isNum
+      const isIntCol = (col === 'Flicker Cycles' || col === 'OP Wavelets') && isNum
       return {
         value: val,
         type: isNum ? Number : String,
-        format: isNum ? (isCycles ? '0' : '0.00') : undefined,
+        format: isNum ? (isIntCol ? '0' : '0.00') : undefined,
         fontWeight: isHighlight ? 'bold' : undefined,
         color: isHighlight ? '#111827' : undefined,
         backgroundColor: isHighlight ? '#FFF59D' : isEven ? '#F8FAFC' : undefined,
@@ -235,6 +255,18 @@ export function formatRecordClipboardTsv(record: ERGSessionRecord): string {
     )
     lines.push(
       `30 Hz Flicker\t${fl.mean_peak_to_trough_uv.toFixed(2)}\t${fl.std_peak_to_trough_uv.toFixed(2)}\t${fl.fft_fundamental_amp_uv.toFixed(2)}\t${fl.fft_peak_to_peak_uv.toFixed(2)}\t${fl.dominant_freq_hz.toFixed(2)}\t${fl.cycles_detected}`,
+    )
+  } else if (record.protocol === 'dark_adapted_3_ops') {
+    const ops = computeOpMetrics(record.time_ms, signal)
+    const opVals = [0, 1, 2, 3].map((i) =>
+      i < ops.op_amplitudes_uv.length ? ops.op_amplitudes_uv[i].toFixed(2) : '—',
+    )
+    lines.push('')
+    lines.push(
+      'Oscillatory Potentials\tSum OPs (uV)\tOP1 (uV)\tOP2 (uV)\tOP3 (uV)\tOP4 (uV)\tFreq (Hz)\tWavelets',
+    )
+    lines.push(
+      `DA 3.0 OPs\t${ops.sum_op_amplitude_uv.toFixed(2)}\t${opVals.join('\t')}\t${ops.dominant_freq_hz.toFixed(2)}\t${ops.op_count}`,
     )
   }
   return lines.join('\n')

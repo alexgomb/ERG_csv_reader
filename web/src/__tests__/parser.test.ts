@@ -33,23 +33,29 @@ describe('CSO Retimax CSV Parser (web)', () => {
     expect(rec.time_ms[511]).toBeCloseTo(249.511719, 4)
   })
 
-  it('skips RIGHT - OD files by default and includes all 8 when enabled', () => {
+  it('skips RIGHT - OD files by default and includes all 10 when enabled', () => {
     const allFiles = fs
       .readdirSync(EXAMPLE_DIR)
       .filter((f) => f.endsWith('.csv'))
       .map((name) => ({ name, relativePath: `example_files/${name}`, content: loadExampleBytes(name) }))
 
     const leftOnly = loadCsvFilesBatch(allFiles)
-    expect(leftOnly.records.length).toBe(4)
-    expect(leftOnly.skipped_right_od.length).toBe(4)
+    expect(leftOnly.records.length).toBe(5)
+    expect(leftOnly.skipped_right_od.length).toBe(5)
     expect(leftOnly.errors.length).toBe(0)
     expect(leftOnly.records.every((r) => r.eye === 'LEFT - OS')).toBe(true)
+
+    const opsRec = leftOnly.records.find((r) => r.file_name.includes('OSCILLATORY'))!
+    expect(opsRec.protocol).toBe('dark_adapted_3_ops')
+    expect(inferProtocol('Potenciales_Oscilatorios_P21.csv', opsRec.time_ms)).toBe(
+      'dark_adapted_3_ops',
+    )
 
     const withOd = loadCsvFilesBatch(allFiles, {
       ...defaultDetectionConfig(),
       include_right_od: true,
     })
-    expect(withOd.records.length).toBe(8)
+    expect(withOd.records.length).toBe(10)
     expect(withOd.skipped_right_od.length).toBe(0)
   })
 

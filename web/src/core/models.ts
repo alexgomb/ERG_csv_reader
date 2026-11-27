@@ -3,7 +3,7 @@
  */
 
 export const APP_NAME = 'nBio ERG-Trace'
-export const APP_VERSION = '0.2.0'
+export const APP_VERSION = '0.3.0'
 export const APP_AUTHOR = 'Alejandro Gombau García'
 export const APP_LICENSE = 'MIT'
 export const REPO_URL = 'https://github.com/alexgomb/ERG_csv_reader'
@@ -14,6 +14,7 @@ export type EyeSide = 'LEFT - OS' | 'RIGHT - OD' | 'UNKNOWN'
 export type ERGProtocol =
   | 'dark_adapted_3'
   | 'dark_adapted_10'
+  | 'dark_adapted_3_ops'
   | 'light_adapted_3'
   | 'light_adapted_3_flicker'
   | 'unknown'
@@ -21,6 +22,7 @@ export type ERGProtocol =
 export const PROTOCOL_ORDER: readonly ERGProtocol[] = [
   'dark_adapted_3',
   'dark_adapted_10',
+  'dark_adapted_3_ops',
   'light_adapted_3',
   'light_adapted_3_flicker',
   'unknown',
@@ -32,6 +34,8 @@ export function protocolDisplayName(protocol: ERGProtocol): string {
       return 'DARK-ADAPTED 3.0 ERG'
     case 'dark_adapted_10':
       return 'DARK-ADAPTED 10.0 ERG'
+    case 'dark_adapted_3_ops':
+      return 'DARK-ADAPTED 3.0 OSCILLATORY POTENTIALS'
     case 'light_adapted_3':
       return 'LIGHT-ADAPTED 3.0 ERG'
     case 'light_adapted_3_flicker':
@@ -47,6 +51,8 @@ export function protocolShortLabel(protocol: ERGProtocol): string {
       return 'DA 3.0'
     case 'dark_adapted_10':
       return 'DA 10.0'
+    case 'dark_adapted_3_ops':
+      return 'OPs'
     case 'light_adapted_3':
       return 'LA 3.0'
     case 'light_adapted_3_flicker':
@@ -60,6 +66,7 @@ export function isValidProtocol(value: unknown): value is ERGProtocol {
   return (
     value === 'dark_adapted_3' ||
     value === 'dark_adapted_10' ||
+    value === 'dark_adapted_3_ops' ||
     value === 'light_adapted_3' ||
     value === 'light_adapted_3_flicker' ||
     value === 'unknown'
@@ -97,6 +104,14 @@ export function defaultDetectionWindows(): Record<ERGProtocol, DetectionWindow> 
       b_max_ms: 100.0,
       c_min_ms: 95.0,
       c_max_ms: 190.0,
+    },
+    dark_adapted_3_ops: {
+      a_min_ms: 14.0,
+      a_max_ms: 32.0,
+      b_min_ms: 28.0,
+      b_max_ms: 48.0,
+      c_min_ms: 36.0,
+      c_max_ms: 60.0,
     },
     light_adapted_3: {
       a_min_ms: 8.0,
@@ -212,6 +227,16 @@ export interface FlickerMetrics {
   dominant_freq_hz: number
   cycles_detected: number
   first_peak_time_ms: number
+}
+
+export interface OPMetrics {
+  op_amplitudes_uv: number[]
+  op_peak_times_ms: number[]
+  sum_op_amplitude_uv: number
+  max_op_amplitude_uv: number
+  dominant_freq_hz: number
+  fft_band_amp_uv: number
+  op_count: number
 }
 
 export interface ERGSessionRecord {

@@ -22,7 +22,7 @@ EXAMPLE_DIR = Path(__file__).resolve().parents[1] / "example_files"
 
 def test_export_batch_csv_and_xlsx(tmp_path: Path) -> None:
     records = load_csv_batch([EXAMPLE_DIR]).records
-    assert len(records) == 4
+    assert len(records) == 5
     records[0].metadata.strain_lastname = "C57"
     records[0].metadata.mouse_id_name = "C57 P21"
     records[0].metadata.age = "P21"
@@ -31,11 +31,14 @@ def test_export_batch_csv_and_xlsx(tmp_path: Path) -> None:
     assert csv_out.is_file()
     with csv_out.open("r", encoding="utf-8-sig", newline="") as handle:
         rows = list(csv.DictReader(handle))
-    assert len(rows) == 4
+    assert len(rows) == 5
     assert rows[0]["Strain / Lastname"] == "C57"
     assert rows[0]["Mouse ID / Name"] == "C57 P21"
     flicker_row = next(r for r in rows if "Flicker" in r["File Name"])
     assert float(flicker_row["Flicker Freq (Hz)"]) == 30.0
+    op_row = next(r for r in rows if "OSCILLATORY" in r["File Name"])
+    assert float(op_row["OP Sum Amplitude (uV)"]) == 66.06
+    assert int(op_row["OP Wavelets"]) == 4
 
     xlsx_out = export_summary_xlsx(records, tmp_path / "summary.xlsx")
     assert xlsx_out.is_file()
@@ -43,7 +46,7 @@ def test_export_batch_csv_and_xlsx(tmp_path: Path) -> None:
     assert "ERG Summary" in wb.sheetnames
     assert "Export Info" in wb.sheetnames
     ws = wb["ERG Summary"]
-    assert ws.max_row == 5  # 1 header + 4 records
+    assert ws.max_row == 6  # 1 header + 5 records
     info_ws = wb["Export Info"]
     info_values = [info_ws.cell(r, 2).value for r in range(1, info_ws.max_row + 1)]
     assert "Alejandro Gombau García" in info_values
@@ -57,6 +60,12 @@ def test_clipboard_tsv_format() -> None:
     assert "Amplitude (uV)" in tsv
     assert "Peak time (ms)" in tsv
     assert "30 Hz Flicker" in tsv
+
+    ops_rec = next(r for r in records if "OSCILLATORY" in r.file_name)
+    op_tsv = format_record_clipboard_tsv(ops_rec)
+    assert "Oscillatory Potentials" in op_tsv
+    assert "DA 3.0 OPs" in op_tsv
+    assert "66.06" in op_tsv
 
 
 def test_session_json_save_and_reload_preserves_manual_markers_and_metadata(tmp_path: Path) -> None:
@@ -84,7 +93,7 @@ def test_session_json_save_and_reload_preserves_manual_markers_and_metadata(tmp_
 
     loaded_records, loaded_cfg, active_id, warnings = load_session_json(session_file)
     assert warnings == []
-    assert len(loaded_records) == 4
+    assert len(loaded_records) == 5
     assert active_id == target.record_id
     assert loaded_cfg.include_right_od is False
 

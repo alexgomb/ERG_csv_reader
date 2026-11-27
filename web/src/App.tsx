@@ -39,6 +39,8 @@ const BUNDLED_EXAMPLES = [
   'Dark-Adapted_10_ERG_RIGHT - OD.csv',
   'Dark-Adapted_3_ERG_RIGHT_LEFT - OS.csv',
   'Dark-Adapted_3_ERG_RIGHT_RIGHT - OD.csv',
+  'Dark-Adapted_3_OSCILLATORY_POTENTIAL_ERG_LEFT - OS.csv',
+  'Dark-Adapted_3_OSCILLATORY_POTENTIAL_ERG_RIGHT - OD.csv',
   'Light-Adapted_3_ERG_LEFT - OS.csv',
   'Light-Adapted_3_ERG_RIGHT - OD.csv',
   'Light-Adapted_3_Flicker_ERG_LEFT - OS.csv',
