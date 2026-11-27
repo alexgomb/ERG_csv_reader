@@ -42,7 +42,12 @@ def auto_detect_markers(
     """
     n = len(time_ms)
     if n < 3:
-        return MarkerIndices(a1_idx=0, b1_idx=min(1, n - 1), c1_idx=max(0, n - 1), is_manual=False)
+        return MarkerIndices(
+            a1_idx=0,
+            b1_idx=max(0, min(1, n - 1)),
+            c1_idx=max(0, n - 1),
+            is_manual=False,
+        )
 
     cfg = config or DetectionConfig()
     win = cfg.get_window(protocol)
@@ -177,7 +182,7 @@ def compute_flicker_metrics(
 
     # Single-sided FFT fundamental component around ~30 Hz (20–45 Hz band)
     centered = signal_uv - float(np.mean(signal_uv))
-    freqs = np.fft.rfftfreq(n, d=dt_ms / 1000.0)
+    freqs = np.fft.rfftfreq(n, d=1.0 / fs_hz)
     spectrum = (2.0 / n) * np.abs(np.fft.rfft(centered))
 
     band_mask = (freqs >= 20.0) & (freqs <= 45.0)

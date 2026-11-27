@@ -126,3 +126,91 @@ def test_manual_protocol_selector_toggles_flicker_panel(qtbot) -> None:
     assert not win.metrics_panel.flicker_card.isVisibleTo(win.metrics_panel)
 
 
+def test_mainwindow_edge_cases_removal_channel_scale_settings_and_clipboard(qtbot) -> None:
+    from PySide6.QtWidgets import QApplication
+
+    from erg_reader.models import DetectionConfig, ERGProtocol
+    from erg_reader.ui.dialogs import SettingsDialog
+
+    win = MainWindow(use_settings=False, initial_language="en", initial_theme="light")
+    qtbot.addWidget(win)
+    win.load_example_files()
+    assert len(win.records) == 4
+
+    # Switch active trace channel (AV1 -> GAV) and ensure metrics stay populated
+    win._on_channel_changed("GAV(uV)")
+    assert win.active_record is not None
+    assert win.active_record.active_channel == "GAV(uV)"
+
+    # Scale, magnifier, grid, and clipboard copy
+    win._set_auto_scale(True)
+    assert win.plot_panel._auto_scale is True
+    win._on_magnifier_changed(2.0)
+    assert win.plot_panel._auto_scale is False
+    assert win.plot_panel._magnifier == 2.0
+    win._apply_retimax_250_scale()
+    assert win.plot_panel._magnifier == 1.0
+    win._set_grid_visible(False, persist=False)
+    assert win.plot_panel._show_grid is False
+    win.copy_table_to_clipboard()
+    assert "LEFT - OS" in QApplication.clipboard().text()
+
+    # SettingsDialog min > max auto-normalization + restore defaults
+    dlg = SettingsDialog(DetectionConfig(), win.translator, parent=win)
+    qtbot.addWidget(dlg)
+    dlg.include_od_chk.setChecked(True)
+    dlg._spins[ERGProtocol.DARK_ADAPTED_3]["a_min_ms"].setValue(50.0)
+    dlg._spins[ERGProtocol.DARK_ADAPTED_3]["a_max_ms"].setValue(10.0)
+    cfg = dlg.get_config()
+    assert cfg.include_right_od is True
+    assert cfg.get_window(ERGProtocol.DARK_ADAPTED_3).a_min_ms == 10.0
+    assert cfg.get_window(ERGProtocol.DARK_ADAPTED_3).a_max_ms == 50.0
+    dlg._on_restore_defaults()
+    restored_cfg = dlg.get_config()
+    assert restored_cfg.include_right_od is False
+    assert restored_cfg.get_window(ERGProtocol.DARK_ADAPTED_3).a_min_ms == 8.0
+
+    # Remove records one by one down to empty state without crashing
+    for rec_id in [r.record_id for r in list(win.records)]:
+        win.remove_record(rec_id)
+    assert win.records == []
+    assert win.active_record is None
+    assert win.metrics_panel.table.item(0, 1).text() == "—"
+
+    # Removing nonexistent ID or resetting markers on empty state is a safe no-op
+    win.remove_record("missing_id")
+    win.reset_active_markers()
+    win.clear_all_records()
+
+
+def test_i18n_parity_and_institutional_svg_assets(qtbot):
+    import erg_reader
+    from erg_reader.i18n import TRANSLATIONS
+    from erg_reader.ui.branding import render_umh_nbio_pixmap
+
+    en_keys = set(TRANSLATIONS["en"].keys())
+    es_keys = set(TRANSLATIONS["es"].keys())
+    assert en_keys == es_keys
+    for lang in ("en", "es"):
+        for k, v in TRANSLATIONS[lang].items():
+            assert isinstance(v, str) and v.strip(), f"Empty translation for {lang}.{k}"
+
+    assets_dir = Path(erg_reader.__file__).resolve().parent / "assets"
+    for svg_name in ("umh_nbio_light.svg", "umh_nbio_dark.svg"):
+        svg_path = assets_dir / svg_name
+        assert svg_path.exists()
+        content = svg_path.read_text(encoding="utf-8")
+        assert "<svg" in content
+        # Pure vector without clipPath/mask for QtSvg Tiny 1.2 compatibility
+        assert "<clipPath" not in content
+
+    for dark_mode in (False, True):
+        pm = render_umh_nbio_pixmap(width=220, dark_mode=dark_mode)
+        assert not pm.isNull()
+        assert pm.width() > 0 and pm.height() > 0
+
+
+
+
+
+

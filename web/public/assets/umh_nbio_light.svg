@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426 102" width="426" height="102" role="img" aria-label="Universidad Miguel Hernández — Grupo nBio">
+  <defs>
+    <!-- Luminous lime-to-olive radial gradient matching official nBio sphere -->
+    <radialGradient id="nbio-sphere-grad" gradientUnits="userSpaceOnUse" cx="290" cy="38" r="56" fx="285" fy="34">
+      <stop offset="0%" stop-color="#D7FF5E"/>
+      <stop offset="32%" stop-color="#ACE032"/>
+      <stop offset="68%" stop-color="#759E1E"/>
+      <stop offset="100%" stop-color="#537016"/>
+    </radialGradient>
+  </defs>
+
+  <!-- ==================== UMH MARK (LEFT) ==================== -->
+  <g id="umh-mark">
+    <!-- Solid UMH square -->
+    <rect x="20" y="24" width="52" height="52" rx="1" fill="#1D1D1B"/>
+
+    <!-- Protruding dark calligraphic tips strictly outside the square -->
+    <g fill="none" stroke="#1D1D1B" stroke-width="3.7" stroke-linecap="round" stroke-linejoin="round">
+      <!-- M left leg outside square -->
+      <path d="M 19.5,53.5 C 16.5,61 13.5,68 11,75"/>
+      <!-- H left stem tip below square -->
+      <path d="M 52.8,76.2 L 50.8,84"/>
+      <!-- H crossbar tip right of square -->
+      <path d="M 72.2,60.3 L 77,60.8"/>
+    </g>
+
+    <!-- White calligraphic MH strokes strictly inside the square -->
+    <g fill="none" stroke="#FFFFFF" stroke-width="3.7" stroke-linecap="round" stroke-linejoin="round">
+      <!-- M inside square -->
+      <path d="M 20.5,51.2 C 23.2,44 25.5,38.5 27.5,37.8 C 31.5,36.8 31.8,52 30.2,66.5 C 36.2,58.5 41.5,50 45.5,50 C 49.5,50 48.8,62.5 47,72.5"/>
+      <!-- H left stem inside square -->
+      <path d="M 58,28.5 C 57,45 55,62 53,75.5"/>
+      <!-- H right stem inside square -->
+      <path d="M 68.5,33.5 C 67.5,47.5 66,61.5 64,73.5"/>
+      <!-- H horizontal crossbar inside square -->
+      <path d="M 54,60.8 C 60.5,60.2 66.5,60.1 71.5,60.3"/>
+    </g>
+  </g>
+
+  <!-- ==================== UMH WORDMARK ==================== -->
+  <g id="umh-text" fill="#1D1D1B">
+    <text x="86" y="51" font-family="'DejaVu Sans', 'Segoe UI', Arial, sans-serif" font-size="21.5" font-weight="800" letter-spacing="0.2">UNIVERSITAS</text>
+    <text x="86" y="74" font-family="'DejaVu Serif', Georgia, 'Times New Roman', serif" font-size="19.2" font-style="italic" font-weight="400">Miguel Hernández</text>
+  </g>
+
+  <!-- ==================== nBio SPHERE (SINGLE PURE VECTOR PATH, TRANSPARENT 'n') ==================== -->
+  <path id="nbio-sphere" fill="url(#nbio-sphere-grad)" d="
+    M 332.0,22.0
+    A 41,41 0 1,0 330.8,83.0
+    L 325.5,83.0
+    L 325.5,51.0
+    C 325.5,41.0 312.5,39.0 302.5,45.5
+    L 302.5,83.0
+    L 284.5,83.0
+    L 284.5,23.5
+    L 302.5,23.5
+    L 302.5,32.5
+    C 311.5,24.5 321.5,21.5 332.0,22.0
+    Z
+  "/>
+
+  <!-- ==================== nBio WORDMARK & URL ==================== -->
+  <g id="nbio-text" fill="#68A817">
+    <text x="336" y="34" font-family="'DejaVu Sans', 'Segoe UI', Arial, sans-serif" font-size="27" font-weight="800" letter-spacing="-0.8">bio</text>
+    <text x="337" y="45" font-family="'DejaVu Sans', 'Segoe UI', Arial, sans-serif" font-size="8.0" font-weight="600" letter-spacing="-0.1">http://nbio.umh.es</text>
+  </g>
+</svg>
