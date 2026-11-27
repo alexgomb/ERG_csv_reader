@@ -1,6 +1,30 @@
+<div align="center">
+
+<a href="http://nbio.umh.es">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="src/erg_reader/assets/umh_nbio_dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="src/erg_reader/assets/umh_nbio_light.svg" />
+    <img src="src/erg_reader/assets/umh_nbio_light.svg" alt="Universidad Miguel Hernández — Grupo nBio" width="380" />
+  </picture>
+</a>
+
+<br />
+
+<img src="web/public/favicon.svg" alt="nBio ERG-Trace Emblem" width="56" height="56" />
+
 # nBio ERG-Trace
 
 **Mouse electroretinography (ERG) viewer and amplitude analyzer for CSO Retimax CSV exports — available as a zero-install Web App and a native Desktop App.**
+
+<p>
+  <a href="https://alexgomb.github.io/ERG_csv_reader/"><img src="https://img.shields.io/badge/Live%20Web%20App-Open%20in%20Browser-1D4ED8?style=for-the-badge&logo=githubpages&logoColor=white" alt="Open Live Web App" /></a>
+  <a href="https://github.com/alexgomb/ERG_csv_reader/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/alexgomb/ERG_csv_reader/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=CI" alt="CI Status" /></a>
+  <a href="https://github.com/alexgomb/ERG_csv_reader/actions/workflows/deploy-pages.yml"><img src="https://img.shields.io/github/actions/workflow/status/alexgomb/ERG_csv_reader/deploy-pages.yml?branch=main&style=for-the-badge&logo=githubpages&logoColor=white&label=Pages" alt="GitHub Pages Status" /></a>
+  <a href="https://github.com/alexgomb/ERG_csv_reader/releases/latest"><img src="https://img.shields.io/github/v/release/alexgomb/ERG_csv_reader?style=for-the-badge&color=0F766E&label=Release" alt="Latest Release" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-334155?style=for-the-badge" alt="MIT License" /></a>
+</p>
+
+</div>
 
 ---
 
@@ -27,6 +51,106 @@
 - **Multi-File / Folder Loading & Reference Overlays:** Drag and drop individual CSVs, multiple files, or mouse subfolders recursively. Check any trace in the sidebar to overlay it in muted gray (`GNS` reference style) behind the active waveform.
 - **Batch Export & Work Sessions:** Export all loaded and manually verified records to **CSV** or formatted **Excel (`.xlsx`)**, copy the active metrics table to the clipboard, save high-resolution **PNG** or vector **SVG** plots, and save/reopen **JSON** work sessions preserving cursor adjustments, protocol overrides, and mouse metadata.
 - **Bilingual (EN / ES) & Light / Dark Themes:** Switch language and theme live at any time; preferences and detection windows persist automatically across launches.
+
+---
+
+## Technology Stack
+
+### Native Desktop (`src/erg_reader/`)
+
+<p>
+  <img src="https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.10+" />
+  <img src="https://img.shields.io/badge/PySide6-Qt%206-41CD52?style=for-the-badge&logo=qt&logoColor=white" alt="PySide6 Qt 6" />
+  <img src="https://img.shields.io/badge/PyQtGraph-Waveform%20Canvas-0C4A6E?style=for-the-badge&logo=python&logoColor=white" alt="PyQtGraph" />
+  <img src="https://img.shields.io/badge/NumPy-Signal%20Arrays-013243?style=for-the-badge&logo=numpy&logoColor=white" alt="NumPy" />
+  <img src="https://img.shields.io/badge/SciPy-Peak%20Detection-8CAAE6?style=for-the-badge&logo=scipy&logoColor=white" alt="SciPy" />
+  <img src="https://img.shields.io/badge/OpenPyXL-Excel%20.xlsx-1D6F42?style=for-the-badge" alt="OpenPyXL" />
+  <img src="https://img.shields.io/badge/PyInstaller-Windows%20.exe-1E293B?style=for-the-badge&logo=python&logoColor=white" alt="PyInstaller" />
+  <img src="https://img.shields.io/badge/pytest-49%20Tests-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white" alt="pytest" />
+  <img src="https://img.shields.io/badge/Ruff-Linter-D7FF64?style=for-the-badge&logo=ruff&logoColor=1E293B" alt="Ruff" />
+</p>
+
+### Zero-Install Web App (`web/`) & CI/CD
+
+<p>
+  <img src="https://img.shields.io/badge/React-19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React 19" />
+  <img src="https://img.shields.io/badge/TypeScript-Strict-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Vite-Bundler-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
+  <img src="https://img.shields.io/badge/HTML5-Semantic-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5" />
+  <img src="https://img.shields.io/badge/CSS3-Vanilla%20Themes-1572B6?style=for-the-badge&logo=css&logoColor=white" alt="CSS3" />
+  <img src="https://img.shields.io/badge/SVG-Interactive%20Plot-FFB13B?style=for-the-badge&logo=svg&logoColor=1E293B" alt="SVG" />
+  <img src="https://img.shields.io/badge/Vitest-25%20Tests-6E9F18?style=for-the-badge&logo=vitest&logoColor=white" alt="Vitest" />
+  <img src="https://img.shields.io/badge/Testing%20Library-UI%20Tests-E33332?style=for-the-badge&logo=testinglibrary&logoColor=white" alt="Testing Library" />
+  <img src="https://img.shields.io/badge/Oxlint-Linter-0F172A?style=for-the-badge&logo=oxc&logoColor=white" alt="Oxlint" />
+  <img src="https://img.shields.io/badge/GitHub%20Pages-Static%20Deploy-222222?style=for-the-badge&logo=githubpages&logoColor=white" alt="GitHub Pages" />
+  <img src="https://img.shields.io/badge/GitHub%20Actions-CI%2FCD-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions" />
+</p>
+
+---
+
+## Dual-Platform Architecture
+
+Both the **Native Desktop App** and the **Zero-Install Web App** implement the exact same layered data pipeline with zero server-side processing, locked together by a shared golden-reference contract (`tests/golden_metrics.json`) verified on every commit.
+
+```mermaid
+flowchart TB
+    CSV["CSO Retimax CSV Exports — LEFT - OS (1:1 Raw Microvolts, No Filtering)"]
+
+    subgraph DESKTOP["Native Desktop Architecture — src/erg_reader/ (Python)"]
+        direction TB
+        DP["parser.py — UTF-8/CP1252, Internal Eye Header, Recursive Folders"]
+        DA["analysis.py — NumPy & SciPy find_peaks, Retimax A1/B1/C1 & 30 Hz rfft"]
+        DU["PySide6 + PyQtGraph UI — Draggable Cursors, Overlays, EN/ES, Light/Dark"]
+        DE["exporters.py — CSV, OpenPyXL Excel, PNG/SVG, JSON Session & QSettings"]
+        DB["PyInstaller — Standalone nBio_ERG_Trace.exe (GitHub Releases)"]
+        DP --> DA --> DU --> DE --> DB
+    end
+
+    subgraph WEB["Zero-Install Web Architecture — web/ (100% Local in Browser)"]
+        direction TB
+        WP["fileDrop.ts + parser.ts — Recursive Folder Drop & Internal Eye Header"]
+        WA["analysis.ts — SciPy-Exact findPeaks1D, Retimax A1/B1/C1 & Real DFT"]
+        WU["React 19 + Interactive SVG UI — Pointer Cursors, Overlays, EN/ES, Light/Dark"]
+        WE["exporters.ts — CSV, write-excel-file Excel, PNG/SVG, Self-Contained JSON & localStorage"]
+        WB["Vite Static Bundle — GitHub Pages (alexgomb.github.io/ERG_csv_reader)"]
+        WP --> WA --> WU --> WE --> WB
+    end
+
+    subgraph QA["Shared Verification & CI/CD — .github/workflows/"]
+        direction LR
+        GM["tests/golden_metrics.json — 8 Real CSO Retimax CSVs Reference"]
+        PT["pytest + pytest-qt + Ruff (49 Tests — Ubuntu & Windows)"]
+        WT["Vitest + Testing Library + tsc + Oxlint (25 Tests — Ubuntu)"]
+        GM -.->|"1:1 Parity"| PT
+        GM -.->|"1:1 Parity"| WT
+    end
+
+    CSV --> DP
+    CSV --> WP
+    DA -.->|"Generates & Validates"| GM
+    WA -.->|"Matches Bit-for-Bit"| GM
+
+    classDef input fill:#1E3A8A,stroke:#1D4ED8,color:#FFFFFF
+    classDef py fill:#0F4C81,stroke:#38BDF8,color:#F8FAFC
+    classDef web fill:#065F46,stroke:#34D399,color:#ECFDF5
+    classDef qa fill:#78350F,stroke:#F59E0B,color:#FFFBEB
+
+    class CSV input
+    class DP,DA,DU,DE,DB py
+    class WP,WA,WU,WE,WB web
+    class GM,PT,WT qa
+```
+
+| Layer | Native Desktop (`src/erg_reader/`) | Zero-Install Web App (`web/`) |
+| --- | --- | --- |
+| **Runtime & Privacy** | Local Python / standalone Windows `.exe` | 100% local in-browser SPA (zero uploads) |
+| **CSV & Folder Input** | `parser.py` (`Path.rglob`, drag & drop) | `parser.ts` + `fileDrop.ts` (recursive `webkitGetAsEntry`) |
+| **Peak & Flicker Engine** | `NumPy` + `SciPy` (`find_peaks`, `rfft`) | Pure TypeScript (`findPeaks1D`, exact real DFT) |
+| **Interactive Plot** | `PySide6` + `PyQtGraph` + `QSvgGenerator` | `React 19` + Interactive `SVG` + Canvas PNG export |
+| **Batch Export** | UTF-8 CSV, `OpenPyXL` `.xlsx`, JSON session | UTF-8 CSV, `write-excel-file` `.xlsx`, self-contained JSON |
+| **Preferences Storage** | `QSettings` | `localStorage` (with corrupt-JSON fallback) |
+| **Distribution** | `pip install -e .` & GitHub Release `.exe` | Automatic GitHub Pages deploy on push to `main` |
+| **Automated Tests** | `ruff` + `pytest` + `pytest-qt` (**49 tests**) | `tsc` + `oxlint` + `Vitest` + Testing Library (**25 tests**) |
 
 ---
 
